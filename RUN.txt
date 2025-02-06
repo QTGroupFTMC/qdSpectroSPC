@@ -1,0 +1,44 @@
+1. Activate the Environment
+
+Command Prompt:
+
+
+C:\Users\User\my_venvs\qdSpectro\Scripts\activate
+
+2. Navigate to Project Directory
+
+cd C:\Users\User\Desktop\Julius\Fast stepper scan\qdSpectroSPC
+
+3. Run qdSpectro 
+
+python mainControl.py ESRconfig (or any other config preset)
+
+
+
+============================================
+DAQ_APDInput = "Dev1/ai1"
+DAQ_SampleClk = "PFI3"
+DAQ_StartTrig = "PFI8"
+=============================================
+#  PB_I 
+#  PB_Q 
+#  PB_STARTtrig 
+#  PB_DAQ is the bit number of the sample clock to time the data aquisition.
+#  PB_AOM TTL input of the switch used to Acousto Optic Modulator (AOM).
+#  PB_Microwaves switch on and off SRS microwave signal generator.
+
+PB_I = 0
+PB_Q = 1
+PB_STARTtrig = 2
+PB_DAQ = 3
+PB_AOM = 4
+PB_MW = 5
+
+===============================================
+* A = PB channel connected to the switch on the RF source driving the AOM
+* M = PB channel connected to the switch on the MW output of the SRS signal generator
+* I = PB channel connected to the switch on the I input of the SRS signal generator
+* Q = PB channel connected to the switch on the Q input of the SRS signal generator
+* D = PB channel connected to the DAQ’s sample clock input
+* S = PB channel connected to the DAQ’s start trigger input
+=====================================================
