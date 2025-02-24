@@ -116,6 +116,13 @@ def makeESRseq(t_duration):
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
 	t_readoutBuffer= t_min*round(2*us/t_min)
+	
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	# modified 2025/02/08
+	#AOMchannel = PBchannel(AOM,[0],[t_sigAndref/2])
+	#uWchannel = PBchannel(uW,[0],[t_sigAndref/2])
+	#DAQchannel = PBchannel(DAQ,[(t_sigAndref/2)-t_readoutBuffer,t_sigAndref-t_readoutBuffer],[t_readout,t_readout])
+
 	AOMchannel = PBchannel(AOM,[0],[t_sigAndref])
 	uWchannel = PBchannel(uW,[0],[t_sigAndref/2])
 	DAQchannel = PBchannel(DAQ,[(t_sigAndref/2)-t_readoutBuffer,t_sigAndref-t_readoutBuffer],[t_readout,t_readout])

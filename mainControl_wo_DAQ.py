@@ -5,7 +5,6 @@
 import connectionConfig as conCfg
 import sequenceControl as seqCtl
 import SRScontrol as SRSctl
-import DAQcontrol as DAQctl
 import PBcontrol as PBctl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,6 +17,8 @@ import time
 import math
 from importlib import import_module
 
+
+WaitDurationS = 5
 
 def count_switches(photon_count_array):
 	switch_count = 0
@@ -266,11 +267,6 @@ def runExperiment(expConfigFile):
 			instructionArray=PBctl.programPB(expCfg.sequence,sequenceArgs)
 		SRSctl.enableSRS_RFOutput(SRS)
 					
-		#Configure DAQ
-		DAQclosed = False
-		#DAQtask = DAQctl.configureDAQ(expCfg.Nsamples)
-		DAQtask = DAQctl.configureDAQ_SPC(expCfg.Nsamples)
-
 		if expCfg.plotPulseSequence:
 		# Plot sequence
 			plt.figure(0)
@@ -287,153 +283,18 @@ def runExperiment(expConfigFile):
 					plt.title('Pulse Sequence plot (at last scan point)\n close to proceed with experiment...')
 			plt.show()
 		
-		#Initialize data arrays
-		meanSignalCurrentRun = np.zeros(expCfg.N_scanPts)
-		meanBackgroundCurrentRun = np.zeros(expCfg.N_scanPts)
-		contrastCurrentRun = np.zeros(expCfg.N_scanPts)
-		signal = np.zeros([expCfg.N_scanPts,expCfg.Navg])
-		background = np.zeros([expCfg.N_scanPts,expCfg.Navg])
-		contrast = np.zeros([expCfg.N_scanPts,expCfg.Navg])
 
 		#Run experiment
-		for i_run in range (0,expCfg.Navg):
-			print('Run ',i_run+1,' of ',expCfg.Navg)
-			if expCfg.randomize:
-				if i_run>0:
-					shuffle(expCfg.scannedParam)
-			for i_scanPoint in range (0, expCfg.N_scanPts):
-				#setup next scan iteration (e.g. for ESR experiment, change microwave frequency; for T2 experiment, reprogram pulseblaster with new delay)
-				if expCfg.sequence == 'ESRseq':
-					SRSctl.setSRS_Freq(SRS, expCfg.scannedParam[i_scanPoint])
-				else:
-					seqArgList[0] = expCfg.scannedParam[i_scanPoint]
-					instructionArray= PBctl.programPB(expCfg.sequence,seqArgList)
-				
-				
-				#read DAQ
+		start  =time.time()
+		while True:
 
-				start_time = time.time()
-				#cts=DAQctl.readDAQ(DAQtask,2*expCfg.Nsamples,expCfg.DAQtimeout)
-				cts=DAQctl.readDAQ(DAQtask,2*(expCfg.Nsamples+1),expCfg.DAQtimeout)		# we will discard the first sample. Julius
-				measurement_duration = time.time()-start_time
-
-				
-				# For AOM modulation
-				cts_np = np.array(cts)
-				delta = cts_np[1:]-cts_np[:-1]
-				
-				sig = delta_sig = delta[1::2]
-				bkgnd = delta_bg = delta[0::2]
-				
-				switch_count_sig, switch_idxs_sig = count_switches(delta_sig)
-				switch_count_bg, switch_idxs_bg = count_switches(delta_bg)
-				print(f'Scan point {i_scanPoint+1} of {expCfg.N_scanPts}; counts per scan point: {(cts[-1]-cts[0])/2/(expCfg.Nsamples+1)}, switches: {switch_count_sig}, {measurement_duration = }')
-				
-				
-				# For non-modulated AOM
-				#Extract signal and background counts
-				# discard the first sample. Julius
-				"""
-				cts_even = np.array(cts[0::2])
-				cts_even =cts_even[1:] 
-				cts_odd = np.array(cts[1::2])
-				sig = list(cts_even - cts_odd[:-1])
-				bkgnd = list(cts_odd[1:] - cts_even)
-
-				zero_count = None
-				# filter out zeros
-				
-				sig_np = np.array(sig)
-				sig_np_mask = sig_np>1
-				sig_np_filtered = sig_np[sig_np_mask]
-
-				bkgnd_np = np.array(bkgnd)
-				bkgnd_np_mask = bkgnd_np>1
-				bkgnd_np_filtered = bkgnd_np[bkgnd_np_mask]
-
-				zero_count = len(sig)-len(sig_np_filtered)
-				sig = sig_np_filtered
-				bkgnd = bkgnd_np_filtered
-				print(f'Scan point {i_scanPoint+1} of {expCfg.N_scanPts}; counts per scan point: {(cts[-1]-cts[0])/2/(expCfg.Nsamples+1)}, zeros: {zero_count}')
-				"""
-
-				#Take average of counts
-				meanSignalCurrentRun[i_scanPoint] = np.mean(sig)
-				meanBackgroundCurrentRun[i_scanPoint] = np.mean(bkgnd)
-				if expCfg.shotByShotNormalization:
-					contrastCurrentRun[i_scanPoint] = np.mean(calculateContrast(expCfg.contrastMode,sig,bkgnd))
-				else:
-					contrastCurrentRun[i_scanPoint] = calculateContrast(expCfg.contrastMode,meanSignalCurrentRun[i_scanPoint],meanBackgroundCurrentRun[i_scanPoint])
-				if i_run==0:
-					if expCfg.livePlotUpdate:
-						xValues=expCfg.scannedParam[0:i_scanPoint+1]
-						plt.plot([x/expCfg.plotXaxisUnits for x in xValues],contrastCurrentRun[0:i_scanPoint+1], 'b-')
-						plt.ylabel('Contrast')
-						plt.xlabel(expCfg.xAxisLabel)
-						plt.draw()
-						plt.pause(0.0001)
-					
-					# Save data at intervals dictated by saveSpacing_inPulseLengthPts and at final delay point
-					if (i_scanPoint%expCfg.saveSpacing_inScanPts == 0) or (i_scanPoint==expCfg.N_scanPts-1):
-						data = np.zeros([i_scanPoint+1,3])
-						data[:,0] = expCfg.scannedParam[0:i_scanPoint+1]
-						data[:,1] = meanSignalCurrentRun[0:i_scanPoint+1]
-						data[:,2] = meanBackgroundCurrentRun[0:i_scanPoint+1]
-						dataFile = open(expCfg.dataFileName, 'w')
-						for line in data:
-							dataFile.write("%.0f\t%.8f\t%.8f\n" % tuple(line))
-						paramFile = open(expCfg.paramFileName, 'w')
-						expParamList[1] = i_scanPoint+1
-						paramFile.write(expCfg.formattingSaveString % tuple(expParamList))
-						dataFile.close()
-						paramFile.close()
-					
-			#Sort current run counts in order of increasing delay
-			dataCurrentRun = np.transpose(np.array([expCfg.scannedParam,meanSignalCurrentRun,meanBackgroundCurrentRun,contrastCurrentRun]))
-			sortingIndices = np.argsort(dataCurrentRun[:,0])
-			dataCurrentRun = dataCurrentRun[sortingIndices]
-			#Fill in current run data:
-			sortedScanParam = dataCurrentRun[:,0]
-			signal[:,i_run] = dataCurrentRun[:,1]
-			background[:,i_run] = dataCurrentRun[:,2]
-			contrast[:,i_run] = dataCurrentRun[:,3]
-			
-			#Update quantities for plotting
-			updatedSignal = np.mean(signal[:,0:i_run+1],1)
-			updatedBackground = np.mean(background[:,0:i_run+1],1)
-			updatedContrast = np.mean(contrast[:,0:i_run+1],1)
-			
-			#Update plot:
-			if expCfg.livePlotUpdate: 
-				plt.clf()
-			plt.plot([x/expCfg.plotXaxisUnits for x in sortedScanParam] ,updatedContrast,'b-')
-			plt.ylabel('Contrast')
-			plt.xlabel(expCfg.xAxisLabel)
-			plt.draw()
-			plt.pause(0.001)
-			
-			# Save data at intervals dictated by saveSpacing_inAverages and after final scan
-			if (i_run%expCfg.saveSpacing_inAverages == 0) or (i_run==expCfg.Navg-1):
-				data = np.zeros([expCfg.N_scanPts,3])
-				data[:,0] = sortedScanParam
-				data[:,1] = updatedSignal
-				data[:,2] = updatedBackground
-				dataFile = open(expCfg.dataFileName, 'w')
-				for item in data:
-					dataFile.write("%.0f\t%.8f\t%.8f\n" % tuple(item))
-				paramFile = open(expCfg.paramFileName, 'w')
-				expParamList[3] = i_run+1
-				paramFile.write(expCfg.formattingSaveString % tuple(expParamList))
-				dataFile.close()
-				paramFile.close()
+			print(f'Elapsed time: {time.time()-start}s ')
+			time.sleep(1)
+		
 		
 		#Turn off SRS output
 		SRSctl.disableSRS_RFOutput(SRS)
 
-		#Close DAQ task:
-		DAQctl.closeDAQTask(DAQtask)
-		DAQclosed=True
-		plt.show()
 	except	KeyboardInterrupt:
 		print('User keyboard interrupt. Quitting...')
 		sys.exit()
@@ -441,10 +302,7 @@ def runExperiment(expConfigFile):
 		if 'SRS' in vars():	
 			#Turn off SRS output
 			SRSctl.disableSRS_RFOutput(SRS)
-		if ('DAQtask' in vars()) and  (not DAQclosed):
-			#Close DAQ task:
-			DAQctl.closeDAQTask(DAQtask)
-			DAQclosed=True
+
 	
 if __name__ == "__main__":
 

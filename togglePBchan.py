@@ -67,6 +67,12 @@ print('Press Q to toggle Q phase control \n')
 
 #Wait for user command:
 state= 0 # bit flag of devices which are currently on
+
+device = 'M'
+state = PBtoggle(device,state)
+printStatus(state)
+a =1
+"""
 while True:
 		print('\n To quit, press E. For a list on devices that are on, press W')
 		device = input("Please enter key to toggle a device...\n")
@@ -79,3 +85,5 @@ while True:
 			printStatus(state)
 		else:
 			state = PBtoggle(device,state)
+
+"""

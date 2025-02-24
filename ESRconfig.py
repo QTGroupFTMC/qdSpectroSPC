@@ -83,16 +83,16 @@ t_min = 1e3/PBclk #in ns
 
 # Microwave scan parameters:----------------------------------------------------
 # Start frequency (in Hz):
-startFreq = 2.78e9
+startFreq = 2.83e9
 # End frequency (in Hz):
-endFreq = 2.8e9		#2.93e9
+endFreq = 2.9e9		#2.93e9
 # Number of frequency steps:
-N_scanPts = 21 #200
+N_scanPts = 200
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
 microwavePower = -10 
 # Pulse sequence parameters:----------------------------------------------------
 # Duration of the signal-aquisition half of one iteration of ESR pulse sequence:
-t_duration = 80*us
+t_duration = 400*us
 # Number of fluorescence measurement samples to take at each frequency point:
 Nsamples = 1000
 # Number of averaging runs to do:

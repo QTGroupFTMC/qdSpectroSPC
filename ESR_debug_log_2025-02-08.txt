@@ -1,0 +1,105 @@
+1. SPC "is aplinkos"
+2. mikrodeimantas - SPC nuostoviam rezime
+3. mikrodeimantas - SPC su isjungtom MW ir moduliuota sviesa
+
+
+1. nuliai:
+  su skirtingais filtrais
+
+
+lyg yra silpna nuliu priklausomybe nuo skaiciavimo intervalo: 150@50us, 170@500us
+
+ar nuliai susije su switch'u?
+t.y., ar switch tiek pat, kiek nuliu?
+
+
+switches:
+   
+200us, #1000
+13,15
+
+500us, #1000
+15,17
+
+500us, #10000
+202, 206
+
+Nuliu yra truputi maziau, nei "persijungimmu", apie 20% maziau
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Each rising edge of your external sample clock (e.g., PFI line) causes the NI device to “latch” the current value of the counter register into the data buffer.
+
+
+Trumpi impulsai is SPC gali buti nepagaunami
+Enable a digital filter (if available on your counter input) to ensure short pulses are not missed.
+
+#################################################################
+Kaip keiciasi matavimo laikas nuo switchu kiekio?
+
+Ideja tokia: jei DAQ praleidzia puse ciklo, gali buti arba: 
+a) nepagauna sample clock impulso:
+b) nuskaito du kartus ant to paties impulso
+
+kadangi matuojama iki 2002 nuskaitymo ivykiu:
+a) turetu pailgeti matavimo laikas, turetu buti dvigtubai ilgesniu intervalu, kuriu verte turi buti dviguba
+b) turetu sutrumpeti laikas, turi buti nuliniu intervalu
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Sumazinu OD nuo 5.0 iki 4.0, kad butu daugiau persijungimu
+matavimo laikas software-based time.time()
+
+1000 samples, 2002 read events, 500us, laukiamas matavimo laikas 1.001s
+1. Laser ON: sw = 71, t = 0.974
+             sw = 70, t = 0.97
+
+2. Laser OFF: sw = 0, t = 1.009
+              sw = 0, t = 1.004
+
+3. Laser ON: sw = 78, t = 0.97
+             sw = 75, t = 0.968
+
+4. Laser OFF: sw = 0, t = 1.012
+              sw = 0, t = 1.005
+
+Toks ispudis, kad keletas ms iseina paciam laiko matavimui, ir tada daugmaz sueina prarastu intervalu kiekis ir sutrumpejes laikas. Greiciausiai tas reiskia dviguba impulsa.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pertikrinimui padarom ta pati su didesniu OD ir maziau impulsu
+OD = 5.0
+matavimo laikas software-based time.time()
+
+1000 samples, 2002 read events, 500us, laukiamas matavimo laikas 1.001s
+
+1. Laser OFF:  	sw =  0, t = 1.007
+  		sw =  0, t = 1.007
+2. Laser ON:	sw = 14, t = 0.9999
+  		sw = 16, t = 0.9997
+
+3. Laser OFF:  	sw =  0, t = 1.0077
+  		sw =  0, t = 1.0074
+
+4. Laser ON:	sw = 9, t = 1.0053
+  		sw = 13, t = 0.997
+
+
+5. Laser ON, SPC OFF
+		sw = 0, t = 1.009
+  		sw = 0, t = 1.004
+
+5. Laser ON, SPC OFF
+		sw = 0, t = 1.0095
+  		sw = 0, t = 1.0064
+
+Isvada - DAQ laikas nuo laiko registruoja dviguba nuskaitymo impulsa, kai i kita jo kanala SPC siuncia impulsus. 
+
+
+Ar gali trigerintis apskritai be pulseblaster, tik nuo SPC?
+Ne, nesitrigerina
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Bandom prideti skaitmenini filtra
+Pridejus 100ns skaitmenini filtra, switchai dingsta
+20ns skaitmeninis filtras sugeneruoja mazdaug puse tu switchu, kurie siaip buna
+30ns jau nieko nebepraleidzia
+
+

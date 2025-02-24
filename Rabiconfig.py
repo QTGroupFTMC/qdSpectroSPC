@@ -90,7 +90,7 @@ N_scanPts =500
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
 microwavePower = 5
 # Microwave frequency (Hz):
-microwaveFrequency = 2.916e9 
+microwaveFrequency = 2.7351e9 
 # Pulse sequence parameters:----------------------------------------------------
 # AOM pulse duration (ns)
 t_AOM = 50*us
