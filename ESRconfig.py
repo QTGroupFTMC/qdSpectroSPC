@@ -83,29 +83,29 @@ t_min = 1e3/PBclk #in ns
 
 # Microwave scan parameters:----------------------------------------------------
 # Start frequency (in Hz):
-startFreq = 2.83e9
+startFreq = 2.9e9
 # End frequency (in Hz):
-endFreq = 2.9e9		#2.93e9
+endFreq = 3e9		#2.93e9
 # Number of frequency steps:
 N_scanPts = 200
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
-microwavePower = -10 
+microwavePower = -5
 # Pulse sequence parameters:----------------------------------------------------
 # Duration of the signal-aquisition half of one iteration of ESR pulse sequence:
 t_duration = 400*us
 # Number of fluorescence measurement samples to take at each frequency point:
-Nsamples = 1000
+Nsamples = 2000
 # Number of averaging runs to do:
 Navg = 1
 #DAQ timeout, in seconds:
-DAQtimeout = 10
+DAQtimeout = 6
 # Contrast mode
 contrastMode ='ratio_SignalOverReference'
 # Plotting options--------------------------------------------------------------
 # Live plot update option
 livePlotUpdate = True
 # Plot pulse sequence option  - set to true to plot the pulse sequence
-plotPulseSequence = True
+plotPulseSequence = False
 # Plot x axis units (Hz, kHz, MHz or GHz)
 plotXaxisUnits = Hz
 # Plot x axis label
