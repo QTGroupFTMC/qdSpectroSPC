@@ -1,0 +1,30 @@
+# Ignore all __pycache__ folders in all subdirectories
+__pycache__/
+*/__pycache__/
+
+# Ignore Saved_Data folder (root and subfolders)
+Saved_Data/
+*/Saved_Data/
+
+# Ignore virtual environments
+venv/
+.env/
+.venv/
+
+# Ignore Python packaging
+*.egg-info/
+dist/
+build/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Ignore OS-specific clutter
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/project settings
+.vscode/
+.idea/
