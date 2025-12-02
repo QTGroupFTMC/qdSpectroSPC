@@ -28,6 +28,10 @@ PB_MW = 5
 #DAQ_SampleClk is the Peripheral Function Interface (PFI) terminal of the DAQ to which you have connected the output of the PB_DAQ PulseBlaster channel (i.e. the PulseBlaster channel which generates the TTL pulses that gate/act as a sample clock to time the data aquisition)
 #DAQ_StartTrig is the Peripheral Function Interface (PFI) terminal of the DAQ to which you have connected the output of the PB_STARTtrig PulseBlaster channel (i.e. the PulseBlaster channel which generates the TTL pulses that trigger the start of data aquisition at each experiment scan point)
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#    Analog input parameters (original parameters)      #
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 DAQ_APDInput = "Dev1/ai1"
 DAQ_SampleClk = "PFI3"
 DAQ_StartTrig = "PFI8"
@@ -37,6 +41,19 @@ DAQ_MaxSamplingRate = 1250000
 #Set minVoltage and maxVoltage (in Volts) below to match an AI (analog input) voltage range which is supported by your DAQ and which accommodates the range of voltages output by your photodetector (e.g. the ‘Analog Input’ section of chapter 4 of the NI USB-621x manual version from April 2009 includes a table listing the supported input voltage ranges for the NI DAQ USB-621x series).
 minVoltage=-10
 maxVoltage=10
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#    Single Photon Counting (SPC) input parameters (our modification)      #
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DAQ_MaxSamplingRate_SPC = 1250000
+DAQ_SampleClk_SPC = "PFI3"
+DAQ_ArmStartTrig_SPC = "PFI8"
+
+DAQ_Enable_Digital_Filter_SPC = True   # filter detector afterpulses
+DAQ_Filter_minPulseWidth_SPC = 100e-9  # [s]
+
+DAQ_Counter_SPC = "Dev1/ctr0"
+DAQ_CounterInput_SPC = "/Dev1/PFI12" 
 
 #SRS Connections-------------------------------------------------------
 # Enter below the GPIB address and model name of your SRS.

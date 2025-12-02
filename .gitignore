@@ -28,3 +28,6 @@ Thumbs.db
 # Ignore IDE/project settings
 .vscode/
 .idea/
+
+Saved_Data
+

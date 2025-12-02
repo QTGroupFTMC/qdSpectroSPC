@@ -1,5 +1,14 @@
 # mainControl.py
+from enum import Enum
+from importlib import import_module
+import matplotlib.pyplot as plt
+import numpy as np
+from random import shuffle
+import os
+import sys
+import time
 
+from spinapi import ms,us,ns
 
 #Imports
 import connectionConfig as conCfg
@@ -7,16 +16,6 @@ import sequenceControl as seqCtl
 import SRScontrol as SRSctl
 import DAQcontrol as DAQctl
 import PBcontrol as PBctl
-import matplotlib.pyplot as plt
-import numpy as np
-from spinapi import ms,us,ns
-from random import shuffle
-from os.path import isdir 
-from os import makedirs
-import sys
-import time
-import math
-from importlib import import_module
 
 
 def count_switches(photon_count_array):
@@ -240,12 +239,14 @@ def runExperiment(expConfigFile):
 # This function runs the experiment with input parameters configured by the user in the experiment config file (e.g. ESRconfig, Rabiconfig, etc) and plots and saves the data.
 	try:
 		'''Runs the experiment.'''
+		if isinstance(expConfigFile,Enum):
+			expConfigFile = expConfigFile.value
 		expCfg = import_module(expConfigFile)
 		expCfg.N_scanPts = len(expCfg.scannedParam) #protection against non-integer user inputs for N_scanPts.
 		validateUserInput(expCfg)
 		#Check if save directory exists, and, if not, creates a "Saved Data" folder in the current directory, where all data will be saved.
-		if not (isdir(expCfg.savePath)):
-			makedirs(expCfg.savePath)
+		if not (os.path.isdir(expCfg.savePath)):
+			os.makedirs(expCfg.savePath)
 			print('Warning: Save directory did not exist, creating folder named Saved_Data in the working directory. Data will be saved to this directory.')
 		
 		#Initialise SRS and program PulseBlaster

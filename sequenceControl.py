@@ -21,11 +21,12 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import matplotlib.pyplot as plt
+from collections import namedtuple
 import math
+import matplotlib.pyplot as plt
 import numpy as np
 import sys
-from collections import namedtuple
+
 from spinapi import *
 from connectionConfig import *
 
@@ -40,6 +41,7 @@ TWO_PERIOD = 0x400000
 THREE_PERIOD = 0x600000
 FOUR_PERIOD = 0x800000 
 FIVE_PERIOD= 0xA00000
+
 
 def plotSequence(instructions,channelMasks):
 	scalingFactor = 0.8
@@ -68,8 +70,6 @@ def plotSequence(instructions,channelMasks):
 		channelPulses.append(list(np.add(math.log(channelMask,2),np.multiply(list(pulses[channelMask]),scalingFactor/channelMask))))
 	yTicks = np.arange(math.log(min(channelMasks.values()),2), 1+math.log(max(channelMasks.values()),2),1)
 	return [t_us,channelPulses,yTicks]
-
-
 
 def sequenceEventCataloguer(channels):
 	#Catalogs sequence events in terms of consecutive rising edges on the channels provided. Returns a dictionary, channelBitMasks, whose keys are event (rising/falling edge) times and values are the channelBitMask which indicate which channels are on at that time.
@@ -111,7 +111,7 @@ def makeSequence(sequence, args):
 		print('Error: requested sequence not recognised.')
 		sys.exit
 
-def makeESRseq(t_duration):
+def makeESRseq(t_duration)->list[PBchannel]:
 	t_sigAndref = 2*t_duration
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -130,7 +130,7 @@ def makeESRseq(t_duration):
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels
 
-def makeReadoutDelaySweep(t_readoutDelay,t_AOM):
+def makeReadoutDelaySweep(t_readoutDelay,t_AOM)->list[PBchannel]:
 	t_startTrig = t_min*round(300*ns/t_min)
 	start_delay = t_min*round(5*us/t_min)-t_startTrig
 	t_readout = t_min*round(300*ns/t_min)
@@ -140,7 +140,7 @@ def makeReadoutDelaySweep(t_readoutDelay,t_AOM):
 	channels=[AOMchannel,DAQchannel, STARTtrigchannel]
 	return channels
 	
-def makeRabiSeq(t_uW,t_AOM,t_readoutDelay):
+def makeRabiSeq(t_uW,t_AOM,t_readoutDelay)->list[PBchannel]:
 	start_delay = t_min*round(1*us/t_min) + t_readoutDelay
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -160,7 +160,7 @@ def makeRabiSeq(t_uW,t_AOM,t_readoutDelay):
 	channels.extend([AOMchannel,DAQchannel, STARTtrigchannel])
 	return channels
 
-def makeT1Seq(t_delay,t_AOM,t_readoutDelay,t_pi):
+def makeT1Seq(t_delay,t_AOM,t_readoutDelay,t_pi)->list[PBchannel]:
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
 	uWtoAOM_delay =t_min*round(1*us/t_min)
@@ -174,7 +174,7 @@ def makeT1Seq(t_delay,t_AOM,t_readoutDelay,t_pi):
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels
 	
-def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses):
+def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -205,7 +205,7 @@ def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses):
 	channels=[AOMchannel,DAQchannel, uWchannel, Ichannel, Qchannel, STARTtrigchannel]
 	return channels
 	
-def makeXY8seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfRepeats):
+def makeXY8seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfRepeats)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -234,7 +234,7 @@ def makeXY8seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfRepeats):
 	return channels
 	
 	
-def makecorrelationSpectSeq(t_delay_betweenXY8seqs,t_delay, t_AOM,t_readoutDelay,t_pi,IQpadding,numberOfRepeats):
+def makecorrelationSpectSeq(t_delay_betweenXY8seqs,t_delay, t_AOM,t_readoutDelay,t_pi,IQpadding,numberOfRepeats)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
