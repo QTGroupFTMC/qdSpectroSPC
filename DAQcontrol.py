@@ -49,7 +49,7 @@ from connectionConfig import (
 	DAQ_Filter_minPulseWidth_SPC,
 )
 
-def configureDAQ_SPC(Nsamples):
+def configureDAQ_SPC(Nsamples:int):
 
 	try:
 		Nsamples = Nsamples + 1
@@ -74,7 +74,6 @@ def configureDAQ_SPC(Nsamples):
 		if DAQ_Enable_Digital_Filter_SPC:
 			readTask.timing.samp_clk_dig_fltr_enable = DAQ_Enable_Digital_Filter_SPC
 			readTask.timing.samp_clk_dig_fltr_min_pulse_width = DAQ_Filter_minPulseWidth_SPC  	
-
 
 		# Configure arm start trigger (start trigger is incompatible with counting mode)
 		readArmStartTrig = readTask.triggers.arm_start_trigger
@@ -109,8 +108,6 @@ def configureDAQ(Nsamples):
 		closeDAQTask(readTask)
 		sys.exit()
 	return readTask
-
-
 
 def readDAQ(task,N,timeout):
 	try:

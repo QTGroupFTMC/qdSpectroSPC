@@ -309,15 +309,12 @@ def runExperiment(expConfigFile):
 				else:
 					seqArgList[0] = expCfg.scannedParam[i_scanPoint]
 					instructionArray= PBctl.programPB(expCfg.sequence,seqArgList)
-				
-				
-				#read DAQ
 
+				#read DAQ
 				start_time = time.time()
 				#cts=DAQctl.readDAQ(DAQtask,2*expCfg.Nsamples,expCfg.DAQtimeout)
 				cts=DAQctl.readDAQ(DAQtask,2*(expCfg.Nsamples+1),expCfg.DAQtimeout)		# we will discard the first sample. Julius
 				measurement_duration = time.time()-start_time
-
 				
 				# For AOM modulation
 				cts_np = np.array(cts)

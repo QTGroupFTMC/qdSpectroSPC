@@ -24,23 +24,53 @@
 """
 ESR experiment config
 
-This script can be used to configure mainControl.py to run an Electron Spin Resonance (ESR) experiment. Fluorescence emitted by an NV diamond sample is recorded as a function of the frequency of a microwave drive signal, and the data is saved as a tabulated text file (see below for saving options). The microwave frequency is scanned from startFreq to endFreq in N_scanPts steps. At each frequency point, the script takes 2*Nsamples fluorescence readings, turning the microwaves on and off for successive samples in order to establish the background fluorescence level. We hence have Nsamples with microwaves on (signal counts) and Nsamples with microwaves off (background, or reference, counts). After the first scan over frequencies is complete, the script proceeds to repeat the scan Navg times, averaging the contrast at each frequency point over all runs (see below for contrast definitions and averaging options).
+This script can be used to configure mainControl.py to run an Electron Spin Resonance (ESR) experiment. 
+Fluorescence emitted by an NV diamond sample is recorded as a function of the frequency of a microwave drive 
+signal, and the data is saved as a tabulated text file (see below for saving options). The microwave frequency 
+is scanned from startFreq to endFreq in N_scanPts steps. At each frequency point, the script takes 2*Nsamples 
+fluorescence readings, turning the microwaves on and off for successive samples in order to establish the background
+fluorescence level. We hence have Nsamples with microwaves on (signal counts) and Nsamples with microwaves off
+(background, or reference, counts). After the first scan over frequencies is complete, the script proceeds 
+to repeat the scan Navg times, averaging the contrast at each frequency point over all runs (see below for 
+contrast definitions and averaging options).
 
 -- Contrast setting --
-From signal and background counts, the script will calculate contrast based on one of two formulas, defined by the contrastMode variable. If contrastMode is set to 'ratio_SignalOverReference', contrast is defined as the ratio of signal to background. If contrastMode is set to 'ratio_DifferenceOverSum', contrast is defined as the ratio of the difference between signal and background to the sum of signal and background. The user may also select a 'signalOnly' contrast mode, where only the signal counts are plotted and the background counts are ignored.
+From signal and background counts, the script will calculate contrast based on one of two formulas, defined by 
+the contrastMode variable. If contrastMode is set to 'ratio_SignalOverReference', contrast is defined as the 
+ratio of signal to background. If contrastMode is set to 'ratio_DifferenceOverSum', contrast is defined as the 
+ratio of the difference between signal and background to the sum of signal and background. The user may also 
+select a 'signalOnly' contrast mode, where only the signal counts are plotted and the background counts are ignored.
 
 -- Averaging options --
-By default, for each frequency point, the script calculates the contrast as a function of the averaged signal counts (averaged over the Nsamples signal readings at a given frequency point) and the averaged background counts - e.g. if the contastMode is set to ratio_SignalOverReference, the contrast is, by default, calculated by dividing the average of the Nsamples of signal by the average of the Nsamples of background. If you prefer to instead calculate contrast as a function of subsequent signal and background samples and then average across all samples, set the shotByShotNormalization option to True -e.g. if contrastMode is ratio_SignalOverReference and shotByShotNormalization is set to True, the contrast will be calculated by dividing each signal sample by the subsequent background sample taking the average of these ratios.
+By default, for each frequency point, the script calculates the contrast as a function of the averaged signal 
+counts (averaged over the Nsamples signal readings at a given frequency point) and the averaged background 
+counts - e.g. if the contastMode is set to ratio_SignalOverReference, the contrast is, by default, calculated
+by dividing the average of the Nsamples of signal by the average of the Nsamples of background. If you prefer 
+to instead calculate contrast as a function of subsequent signal and background samples and then average 
+across all samples, set the shotByShotNormalization option to True -e.g. if contrastMode is ratio_SignalOverReference
+and shotByShotNormalization is set to True, the contrast will be calculated by dividing each signal 
+sample by the subsequent background sample taking the average of these ratios.
 
-The first time the script scans over the microwave drive frequency of the signal generator, it does so in order from the smallest to the largest frequency. If Navg>1, the script then repeats the scan Navg times and averages the results. By default, the order of the frequency points is randomized for all but the first scan. If you wish to turn off this randomization, set the randomize option below to False.
+The first time the script scans over the microwave drive frequency of the signal generator, it does so in order
+from the smallest to the largest frequency. If Navg>1, the script then repeats the scan Navg times and averages
+the results. By default, the order of the frequency points is randomized for all but the first scan. If you 
+wish to turn off this randomization, set the randomize option below to False.
 
 -- Plotting options --
-Set livePlotUpdate to True to plot the data as it is acquired. Note that, after the first scan is completed, the plot will only update at the end of every subsequent scan. If livePlotUpdate is set to False, the data will only be plotted at the end of the experiment.
+Set livePlotUpdate to True to plot the data as it is acquired. Note that, after the first scan is completed, 
+the plot will only update at the end of every subsequent scan. If livePlotUpdate is set to False, the data 
+will only be plotted at the end of the experiment.
 
-Set plotPulseSequence to True to plot the pulse sequence which has been programmed into the PulseBlaster. Note that the program will wait for the user to close this plot before continuing.
+Set plotPulseSequence to True to plot the pulse sequence which has been programmed into the PulseBlaster.
+Note that the program will wait for the user to close this plot before continuing.
 
 -- Saving options --
-The user can choose how often the data is saved. For the first scan, there is an option to save at intervals of saveSpacing_inScanPts (i.e. if this variable is set to 2, the script will resave the data at every other frequency point). For subsequent scans, the script will resave the data at the end of a frequency scan, for averaging runs spaced by intervals of saveSpacing_inAverages (e.g. if this is set to 3, the data will be resaved after every 3 averages). Regardless of how the user sets these options, data will always be saved at the end of the first frequency scan and at the end of the experiment (i.e. after the last averaging run).
+The user can choose how often the data is saved. For the first scan, there is an option to save at intervals 
+of saveSpacing_inScanPts (i.e. if this variable is set to 2, the script will resave the data at every other
+frequency point). For subsequent scans, the script will resave the data at the end of a frequency scan, for 
+averaging runs spaced by intervals of saveSpacing_inAverages (e.g. if this is set to 3, the data will be 
+resaved after every 3 averages). Regardless of how the user sets these options, data will always be saved at
+the end of the first frequency scan and at the end of the experiment (i.e. after the last averaging run).
 
 To run this script:
  1) Edit connectionConfig.py to define the PulseBlaster, SRS and DAQ channel connections being used in your setup.
@@ -57,7 +87,8 @@ To run this script:
  *Navg: number of averaging runs (i.e. number of times the frequency scan is repeated).
  *plotPulseSequence: if set to True, this script will generate a plot of the pulse sequence ouput by the PulseBlaster
  *DAQtimeout: amount of time (in seconds) for which the DAQ will wait for the requested number of samples to become available (ie. to be acquired)
- *contrastMode: set this to one of 'ratio_SignalOverReference', 'ratio_DifferenceOverSum' or 'signalOnly', depending on which contrast mode you want to use (see 'Contrast setting' description above)
+ *contrastMode: set this to one of 'ratio_SignalOverReference', 'ratio_DifferenceOverSum' or 'signalOnly', 
+ depending on which contrast mode you want to use (see 'Contrast setting' description above)
  *livePlotUpdate: set this to True to update the plot as data is acquired (see 'Plotting options' above)
  *plotPulseSequence: set this to True to plot the pulse sequence at the start of the experiment (see 'Plotting options' above)
  *plotXaxisUnits: sets x-axis units on the data plot. Select from Hz, kHz, MHz or GHz

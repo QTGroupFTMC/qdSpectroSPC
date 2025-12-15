@@ -24,10 +24,22 @@
 """
 Rabi experiment config
 
-This script can be used to configure mainControl.py to run a Rabi experiment. Fluorescence emitted by an NV diamond sample is recorded as a function of the duration of a microwave drive pulse, and the data is saved as a tabulated text file (see below for saving options). The microwave pulse duration is scanned from startPulseDuration to endPulseDuration in N_scanPts steps. At each scan point, the script takes 2*Nsamples fluorescence readings, turning the microwaves on and off for successive samples in order to establish the background fluorescence level. We hence have Nsamples with microwaves on (signal counts) and Nsamples with microwaves off (background, or reference, counts). After the first scan over pulse durations is complete, the script proceeds to repeat the scan Navg times, averaging the contrast at each scan point over all runs (see below for contrast definitions and averaging options).
+This script can be used to configure mainControl.py to run a Rabi experiment. Fluorescence emitted by an NV diamond 
+sample is recorded as a function of the duration of a microwave drive pulse, and the data is saved as a tabulated 
+text file (see below for saving options). The microwave pulse duration is scanned from startPulseDuration to 
+endPulseDuration in N_scanPts steps. At each scan point, the script takes 2*Nsamples fluorescence readings, turning
+ the microwaves on and off for successive samples in order to establish the background fluorescence level. We hence 
+ have Nsamples with microwaves on (signal counts) and Nsamples with microwaves off (background, or reference, counts). 
+ After the first scan over pulse durations is complete, the script proceeds to repeat the scan Navg times, averaging 
+ the contrast at each scan point over all runs (see below for contrast definitions and averaging options).
 
 -- Contrast setting --
-From signal and background counts, the script will calculate contrast based on one of two formulas, defined by the contrastMode variable. If contrastMode is set to 'ratio_SignalOverReference', contrast is defined as the ratio of signal to background. If contrastMode is set to 'ratio_DifferenceOverSum', contrast is defined as the ratio of the difference between signal and background to the sum of signal and background. The user may also select a 'signalOnly' contrast mode, where only the signal counts are plotted and the background counts are ignored.
+From signal and background counts, the script will calculate contrast based on one of two formulas, 
+defined by the contrastMode variable. If contrastMode is set to 'ratio_SignalOverReference', contrast is 
+defined as the ratio of signal to background. If contrastMode is set to 'ratio_DifferenceOverSum', contrast 
+is defined as the ratio of the difference between signal and background to the sum of signal and background.
+ The user may also select a 'signalOnly' contrast mode, where only the signal counts are plotted and the 
+ background counts are ignored.
 
 -- Averaging options --
 By default, for each scan point, the script calculates the contrast as a function of the averaged signal counts (averaged over the Nsamples signal readings at a given scan point) and the averaged background counts - e.g. if the contastMode is set to ratio_SignalOverReference, the contrast is, by default, calculated by dividing the average of the Nsamples of signal by the average of the Nsamples of background. If you prefer to instead calculate contrast as a function of subsequent signal and background samples and then average across all samples, set the shotByShotNormalization option to True -e.g. if contrastMode is ratio_SignalOverReference and shotByShotNormalization is set to True, the contrast will be calculated by dividing each signal sample by the subsequent background sample taking the average of these ratios.
@@ -97,9 +109,10 @@ t_AOM = 50*us
 # Readout delay (ns)
 t_readoutDelay = 2.3*us
 # Number of fluorescence measurement samples to take at each pulse length point:
-Nsamples = 1000
+Nsamples = 1			# only one to minimize duration; each sample adds 0.8us
+
 # Number of averaging runs to do:
-Navg = 1
+Navg = 1000
 #DAQ timeout, in seconds:
 DAQtimeout = 10
 # Plotting options--------------------------------------------------------------
