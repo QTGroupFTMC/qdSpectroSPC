@@ -111,7 +111,7 @@ def makeSequence(sequence, args:list, use_SPC:bool):
 		print('Error: requested sequence not recognised.')
 		sys.exit
 
-def makeESRseq(t_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
+def makeESRseq(t_duration, t_count_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_sigAndref = 2*t_duration
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -125,7 +125,24 @@ def makeESRseq(t_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
 
 	AOMchannel = PBchannel(AOM,[0],[t_sigAndref])
 	uWchannel = PBchannel(uW,[0],[t_sigAndref/2])
-	DAQchannel = PBchannel(DAQ,[(t_sigAndref/2)-t_readoutBuffer,t_sigAndref-t_readoutBuffer],[t_readout,t_readout])
+	
+	# DAQ channel
+	if make_SPC_sequence:
+		# signal half-cycle
+		end_count_sig = t_duration-t_readoutBuffer
+		start_count_sig = end_count_sig - t_count_duration
+		
+		# reference half-cycle
+		end_count_ref = t_sigAndref-t_readoutBuffer
+		start_count_ref = end_count_ref - t_count_duration
+
+		start_times = [start_count_sig, end_count_sig, start_count_ref, end_count_ref]
+		pulse_durations = [t_readout]*4		
+	else:
+		start_times = [(t_sigAndref/2)-t_readoutBuffer,t_sigAndref-t_readoutBuffer]
+		pulse_durations = [t_readout,t_readout]
+	DAQchannel = PBchannel(DAQ, start_times, pulse_durations)
+	
 	STARTtrigchannel = PBchannel(STARTtrig,[0],[t_startTrig])
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels
@@ -140,12 +157,14 @@ def makeReadoutDelaySweep(t_readoutDelay, t_AOM, make_SPC_sequence:bool = False)
 	channels=[AOMchannel,DAQchannel, STARTtrigchannel]
 	return channels
 	
-def makeRabiSeq(t_uW,t_AOM,t_readoutDelay, make_SPC_sequence:bool = False)->list[PBchannel]:
+def makeRabiSeq(t_uW, t_AOM, t_readoutDelay, t_count_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
 	start_delay = t_min*round(1*us/t_min) + t_readoutDelay
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
 	uWtoAOM_delay =t_min*round(1*us/t_min)	
 	firstHalfDuration = start_delay + t_uW + uWtoAOM_delay+t_AOM
+
+	# MW channel
 	if t_uW <=5*t_min and t_uW>0:
 		uWchannel = PBchannel(uW,[start_delay],[5*t_min])
 		shortpulseFLAG = int((t_uW/2)*ONE_PERIOD)
@@ -154,8 +173,39 @@ def makeRabiSeq(t_uW,t_AOM,t_readoutDelay, make_SPC_sequence:bool = False)->list
 	else:
 		uWchannel = PBchannel(uW,[start_delay],[t_uW])
 		channels = [uWchannel]
+	
+	# AOM channel
 	AOMchannel = PBchannel(AOM,[firstHalfDuration-t_AOM,2*firstHalfDuration-t_AOM],[t_AOM,t_AOM])
-	DAQchannel = PBchannel(DAQ,[firstHalfDuration-t_AOM+t_readoutDelay,2*firstHalfDuration-t_AOM+t_readoutDelay],[t_readout,t_readout])
+
+	# DAQ channel
+	if make_SPC_sequence:
+		signal_half_duration = firstHalfDuration
+
+		# Signal half cycle
+		AOM_pulse_start = start_delay + t_uW + uWtoAOM_delay   # First AOM pulse
+		start_count = AOM_pulse_start + t_readoutDelay
+		end_count = start_count + t_count_duration
+		
+		start_times_signal_half = [start_count, end_count]
+		durations_signal_half = [t_readout, t_readout]
+
+		# reference half-cycle
+		AOM_pulse_ref = signal_half_duration + AOM_pulse_start	# second (reference) AOM pulse
+		start_count = AOM_pulse_ref + t_readoutDelay
+		end_count = start_count + t_count_duration
+
+		start_times_ref_half = [start_count, end_count]
+		durations_ref_half = [t_readout, t_readout]
+
+		# Full cycle parameters
+		DAQ_start_times = start_times_signal_half + start_times_ref_half
+		DAQ_pulse_durations = durations_signal_half + durations_ref_half
+	else:
+		DAQ_start_times = [firstHalfDuration-t_AOM+t_readoutDelay,2*firstHalfDuration-t_AOM+t_readoutDelay]
+		DAQ_pulse_durations = [t_readout,t_readout]
+	DAQchannel = PBchannel(DAQ, DAQ_start_times, DAQ_pulse_durations)
+
+	# START trigger channel
 	STARTtrigchannel = PBchannel(STARTtrig,[0],[t_startTrig])
 	channels.extend([AOMchannel,DAQchannel, STARTtrigchannel])
 	return channels
@@ -174,7 +224,7 @@ def makeT1Seq(t_delay, t_AOM, t_readoutDelay, t_pi, make_SPC_sequence:bool = Fal
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels
 	
-def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses, make_SPC_sequence:bool = False)->list[PBchannel]:
+def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses, t_count_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -186,6 +236,7 @@ def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses, mak
 	AOMstartTime1 = start_delay+CPMGduration +uWtoAOM_delay
 	DAQstartTime1 = AOMstartTime1+t_readoutDelay
 	firstHalfDuration = AOMstartTime1+t_AOM 
+	
 	#Make pulses for background half of the sequence:
 	uWstartTimes2 =[x+firstHalfDuration for x in uWstartTimes1]
 	#IstartTimes2 = [x+firstHalfDuration for x in IstartTimes1]
@@ -197,7 +248,12 @@ def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses, mak
 	uWstartTimes=uWstartTimes1 +uWstartTimes2
 	#Make channels:
 	AOMchannel 		 = PBchannel(AOM,[AOMstartTime1,AOMstartTime2],[t_AOM,t_AOM])
-	DAQchannel 		 = PBchannel(DAQ,[DAQstartTime1,DAQstartTime2],[t_readout,t_readout])
+	if make_SPC_sequence:
+		DAQendTime1 = DAQstartTime1 + t_count_duration
+		DAQendTime2 = DAQstartTime2 + t_count_duration
+		DAQchannel 	 = PBchannel(DAQ,[DAQstartTime1,DAQendTime1,DAQstartTime2,DAQendTime1],[t_readout]*4)
+	else:
+		DAQchannel 	 = PBchannel(DAQ,[DAQstartTime1,DAQstartTime2],[t_readout,t_readout])
 	uWchannel  		 = PBchannel(uW,uWstartTimes1 +uWstartTimes2,uWdurations+uWdurations)
 	Ichannel   		 = PBchannel(I,IstartTimes1,Idurations)
 	Qchannel   		 = PBchannel(Q,QstartTimes1+QstartTimes2,Qdurations+Qdurations[:-1])

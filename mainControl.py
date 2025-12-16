@@ -265,13 +265,17 @@ def runExperiment(expConfigFile):
 		else:
 			SRSctl.setSRS_Freq(SRS, expCfg.scannedParam[0])
 			#Program PB
-			instructionArray=PBctl.programPB(expCfg.sequence,sequenceArgs, use_SPC=use_SPC)
+			instructionArray=PBctl.programPB(expCfg.sequence, sequenceArgs, use_SPC=use_SPC)
 		SRSctl.enableSRS_RFOutput(SRS)
 					
 		#Configure DAQ
 		DAQclosed = False
-		#DAQtask = DAQctl.configureDAQ(expCfg.Nsamples)
-		DAQtask = DAQctl.configureDAQ_SPC(expCfg.Nsamples)
+		
+		if use_SPC:
+			DAQtask = DAQctl.configureDAQ_SPC(expCfg.Nsamples)
+		else:
+			DAQtask = DAQctl.configureDAQ(expCfg.Nsamples)
+		
 
 		if expCfg.plotPulseSequence:
 		# Plot sequence
@@ -289,7 +293,7 @@ def runExperiment(expConfigFile):
 					plt.title('Pulse Sequence plot (at last scan point)\n close to proceed with experiment...')
 			plt.show()
 		
-		#Initialize data arrays
+		#Initialize data arrays 
 		meanSignalCurrentRun = np.zeros(expCfg.N_scanPts)
 		meanBackgroundCurrentRun = np.zeros(expCfg.N_scanPts)
 		contrastCurrentRun = np.zeros(expCfg.N_scanPts)
@@ -312,49 +316,18 @@ def runExperiment(expConfigFile):
 					instructionArray= PBctl.programPB(expCfg.sequence,seqArgList, use_SPC=use_SPC)
 
 				#read DAQ
-				start_time = time.time()
-				#cts=DAQctl.readDAQ(DAQtask,2*expCfg.Nsamples,expCfg.DAQtimeout)
-				cts=DAQctl.readDAQ(DAQtask,2*(expCfg.Nsamples+1),expCfg.DAQtimeout)		# we will discard the first sample. Julius
-				measurement_duration = time.time()-start_time
-				
-				# For AOM modulation
-				cts_np = np.array(cts)
-				delta = cts_np[1:]-cts_np[:-1]
-				
-				sig = delta_sig = delta[1::2]
-				bkgnd = delta_bg = delta[0::2]
-				
-				switch_count_sig, switch_idxs_sig = count_switches(delta_sig)
-				switch_count_bg, switch_idxs_bg = count_switches(delta_bg)
-				print(f'Scan point {i_scanPoint+1} of {expCfg.N_scanPts}; counts per scan point: {(cts[-1]-cts[0])/2/(expCfg.Nsamples+1)}, switches: {switch_count_sig}, {measurement_duration = }')
-				
-				
-				# For non-modulated AOM
-				#Extract signal and background counts
-				# discard the first sample. Julius
-				"""
-				cts_even = np.array(cts[0::2])
-				cts_even =cts_even[1:] 
-				cts_odd = np.array(cts[1::2])
-				sig = list(cts_even - cts_odd[:-1])
-				bkgnd = list(cts_odd[1:] - cts_even)
+				if use_SPC:
+					cts = DAQctl.readDAQ(DAQtask,4*expCfg.Nsamples,expCfg.DAQtimeout)		# we will discard the first sample. Julius
+					cts_np = np.array(cts)
 
-				zero_count = None
-				# filter out zeros
-				
-				sig_np = np.array(sig)
-				sig_np_mask = sig_np>1
-				sig_np_filtered = sig_np[sig_np_mask]
+					cts_in_interval = cts_np[1::2] - cts_np[0::2] # inteval_counts = end_count_val - start_count_val
+					sig = list(cts_in_interval[1::2])
+					bkgnd = list(cts_in_interval[0::2])
 
-				bkgnd_np = np.array(bkgnd)
-				bkgnd_np_mask = bkgnd_np>1
-				bkgnd_np_filtered = bkgnd_np[bkgnd_np_mask]
-
-				zero_count = len(sig)-len(sig_np_filtered)
-				sig = sig_np_filtered
-				bkgnd = bkgnd_np_filtered
-				print(f'Scan point {i_scanPoint+1} of {expCfg.N_scanPts}; counts per scan point: {(cts[-1]-cts[0])/2/(expCfg.Nsamples+1)}, zeros: {zero_count}')
-				"""
+				else:
+					cts = DAQctl.readDAQ(DAQtask,2*expCfg.Nsamples,expCfg.DAQtimeout)
+					sig = cts[0::2]
+					bkgnd = cts[1::2]
 
 				#Take average of counts
 				meanSignalCurrentRun[i_scanPoint] = np.mean(sig)

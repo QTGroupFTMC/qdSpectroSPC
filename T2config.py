@@ -89,6 +89,7 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = False
+t_count_duration = 1000
 # Scan parameters:-------------------------------------------------------------
 # Start delay duration (in nanoseconds):
 startTau =208*2
@@ -168,7 +169,7 @@ formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n
 expParamList = ['N_scanPts:',N_scanPts,'Navg:',Navg,'Nsamples:',Nsamples,'startTau:',scannedParam[0],'endTau:',scannedParam[-1],'microwavePower:',microwavePower,'microwaveFrequency',microwaveFrequency,'t_AOM:',t_AOM, 't_readoutDelay:',t_readoutDelay,'t_pi',t_pi,'numberOfPiPulses',numberOfPiPulses,'IQpadding',IQpadding,'shotByShotNormalization:',shotByShotNormalization,'randomize:',randomize,'plotPulseSequence:',plotPulseSequence,'saveSpacing_inScanPts:',saveSpacing_inScanPts,'saveSpacing_inAverages:',saveSpacing_inAverages,'dataFileName:',dataFileName]
 
 def updateSequenceArgs():
-	sequenceArgs = [t_AOM,t_readoutDelay,t_pi,IQpadding,numberOfPiPulses]
+	sequenceArgs = [t_AOM, t_readoutDelay, t_pi, IQpadding, numberOfPiPulses, t_count_duration]
 	return sequenceArgs
 	
 def updateExpParamList():

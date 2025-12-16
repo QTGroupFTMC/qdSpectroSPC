@@ -114,6 +114,8 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = True
+t_count_duration = 1000 # photon counting interval at each measurement half-cycle
+
 # Microwave scan parameters:----------------------------------------------------
 # Start frequency (in Hz):
 startFreq = 2.9e9
@@ -180,7 +182,7 @@ formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n
 expParamList =  ['N_scanPts:',N_scanPts,'Navg:',Navg,'Nsamples:',Nsamples,'startFreq:',scannedParam[0],'endFreq:',scannedParam[-1],'microwavePower:',microwavePower,'t_duration:',t_duration,'shotByShotNormalization:',shotByShotNormalization,'randomize:',randomize,'plotPulseSequence:',plotPulseSequence,'saveSpacing_inScanPts:',saveSpacing_inScanPts,'saveSpacing_inAverages:',saveSpacing_inAverages,'dataFileName:',dataFileName]
 
 def updateSequenceArgs():
-	sequenceArgs = [t_duration]
+	sequenceArgs = [t_duration, t_count_duration]
 	return sequenceArgs
 	
 def updateExpParamList():

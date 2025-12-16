@@ -52,9 +52,8 @@ from connectionConfig import (
 def configureDAQ_SPC(Nsamples:int):
 
 	try:
-		Nsamples = Nsamples + 1
 		#Create and configure an analog input voltage task
-		NsampsPerDAQread=2*Nsamples
+		NsampsPerDAQread=4*Nsamples  # signal half-cycle: count_start, count_end; reference half-cycle: count_start, count_end
 		readTask = nidaqmx.Task()
 		#channel = readTask.ai_channels.add_ai_voltage_chan(DAQ_APDInput,"",TerminalConfiguration.RSE,minVoltage,maxVoltage,VoltageUnits.VOLTS)
 		

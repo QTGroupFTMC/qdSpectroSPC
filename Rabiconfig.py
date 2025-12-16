@@ -94,6 +94,7 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = True
+t_count_duration = 1000 # photon counting interval at each measurement half-cycle
 # Microwave scan parameters:----------------------------------------------------
 # Start pulse duration (in nanoseconds):
 startPulseDuration = 0
@@ -154,7 +155,7 @@ scanEndName = 'endPulseDuration'
 #PB channels
 PBchannels = {'AOM':AOM,'uW':uW,'DAQ':DAQ,'STARTtrig':STARTtrig}
 #Sequence args
-sequenceArgs = [t_AOM,t_readoutDelay]
+sequenceArgs = [t_AOM,t_readoutDelay, t_count_duration]
 #Make save file path
 dateTimeStr = strftime("%Y-%m-%d_%Hh%Mm%Ss", localtime())
 dataFileName = savePath + saveFileName+ dateTimeStr +".txt"
