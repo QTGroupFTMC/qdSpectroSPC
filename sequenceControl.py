@@ -92,26 +92,26 @@ def sequenceEventCataloguer(channels):
 	return channelBitMasks
 
 ################--------------------------------------------- PulseBlaster Sequences---------------------------------------------------###################
-def makeSequence(sequence, args):
+def makeSequence(sequence, args:list, use_SPC:bool):
 	if sequence == 'ESRseq':
-		return makeESRseq(*args)
+		return makeESRseq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'RabiSeq':
-		return makeRabiSeq(*args)
+		return makeRabiSeq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'T1seq':
-		return makeT1Seq(*args)
+		return makeT1Seq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'T2seq':
-		return makeT2Seq(*args)
+		return makeT2Seq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'XY8seq':
-		return makeXY8seq(*args)
+		return makeXY8seq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'correlSpecSeq':
-		return makecorrelationSpectSeq(*args)
+		return makecorrelationSpectSeq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'optimReadoutSeq':
-		return makeReadoutDelaySweep(*args)
+		return makeReadoutDelaySweep(*args, make_SPC_sequence=use_SPC)
 	else:
 		print('Error: requested sequence not recognised.')
 		sys.exit
 
-def makeESRseq(t_duration)->list[PBchannel]:
+def makeESRseq(t_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_sigAndref = 2*t_duration
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -130,7 +130,7 @@ def makeESRseq(t_duration)->list[PBchannel]:
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels
 
-def makeReadoutDelaySweep(t_readoutDelay,t_AOM)->list[PBchannel]:
+def makeReadoutDelaySweep(t_readoutDelay, t_AOM, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_startTrig = t_min*round(300*ns/t_min)
 	start_delay = t_min*round(5*us/t_min)-t_startTrig
 	t_readout = t_min*round(300*ns/t_min)
@@ -140,7 +140,7 @@ def makeReadoutDelaySweep(t_readoutDelay,t_AOM)->list[PBchannel]:
 	channels=[AOMchannel,DAQchannel, STARTtrigchannel]
 	return channels
 	
-def makeRabiSeq(t_uW,t_AOM,t_readoutDelay)->list[PBchannel]:
+def makeRabiSeq(t_uW,t_AOM,t_readoutDelay, make_SPC_sequence:bool = False)->list[PBchannel]:
 	start_delay = t_min*round(1*us/t_min) + t_readoutDelay
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -160,7 +160,7 @@ def makeRabiSeq(t_uW,t_AOM,t_readoutDelay)->list[PBchannel]:
 	channels.extend([AOMchannel,DAQchannel, STARTtrigchannel])
 	return channels
 
-def makeT1Seq(t_delay,t_AOM,t_readoutDelay,t_pi)->list[PBchannel]:
+def makeT1Seq(t_delay, t_AOM, t_readoutDelay, t_pi, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
 	uWtoAOM_delay =t_min*round(1*us/t_min)
@@ -174,7 +174,7 @@ def makeT1Seq(t_delay,t_AOM,t_readoutDelay,t_pi)->list[PBchannel]:
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels
 	
-def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses)->list[PBchannel]:
+def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -205,7 +205,7 @@ def makeT2Seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfPiPulses)->li
 	channels=[AOMchannel,DAQchannel, uWchannel, Ichannel, Qchannel, STARTtrigchannel]
 	return channels
 	
-def makeXY8seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfRepeats)->list[PBchannel]:
+def makeXY8seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfRepeats, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
@@ -234,7 +234,7 @@ def makeXY8seq(t_delay,t_AOM,t_readoutDelay,t_pi,IQpadding, numberOfRepeats)->li
 	return channels
 	
 	
-def makecorrelationSpectSeq(t_delay_betweenXY8seqs,t_delay, t_AOM,t_readoutDelay,t_pi,IQpadding,numberOfRepeats)->list[PBchannel]:
+def makecorrelationSpectSeq(t_delay_betweenXY8seqs, t_delay, t_AOM,t_readoutDelay, t_pi,IQpadding, numberOfRepeats, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_piby2=t_pi/2
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)

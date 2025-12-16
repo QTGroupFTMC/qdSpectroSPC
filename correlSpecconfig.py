@@ -88,6 +88,8 @@ from connectionConfig import *
 t_min = 1e3/PBclk #in ns
 #-------------------------  USER INPUT  ---------------------------------------#
 
+# Detector choice: use single photon counters instead of analog input (instead of diode, for example)
+use_SPC = False
 # Scan parameters:-------------------------------------------------------------
 # Start pulse duration (in nanoseconds). Note that a delay of 2us (rounded to the nearest multiple of t_min)
 # is added to start_tcorr (and all delays in the scan). Therefore, the shortest spacing between XY8 sequences will be given by
@@ -145,6 +147,7 @@ saveFileName = "correlationSpec_"
 shotByShotNormalization = False
 # Option to randomize order of scan points
 randomize = True
+
 #Advanced user options--------------------------------------------------------------
 # IQ padding, in ns (this should be left at t_min*round(30*ns/t_min),unless the user  
 # requires an especially short free precession delay - this parameter should only be 

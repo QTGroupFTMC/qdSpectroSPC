@@ -112,6 +112,8 @@ t_min = 1e3/PBclk #in ns
 
 #-------------------------  USER INPUT  ---------------------------------------#
 
+# Detector choice: use single photon counters instead of analog input (instead of diode, for example)
+use_SPC = True
 # Microwave scan parameters:----------------------------------------------------
 # Start frequency (in Hz):
 startFreq = 2.9e9

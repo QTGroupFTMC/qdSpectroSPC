@@ -32,8 +32,20 @@ class MeasurementConfig(Enum):
 	T2:str = 'T2config'
 	XY8:str = 'XY8config'
 
+SPC_mode_implemented = {
+	MeasurementConfig.COR_SPECT:False,
+	MeasurementConfig.ESR: True,
+	MeasurementConfig.OPT_READ_DELAY: False, 
+	MeasurementConfig.RABI: True,
+	MeasurementConfig.T1: False,
+	MeasurementConfig.T2: False,
+	MeasurementConfig.XY8: False,
+	}
+
 PLOT_PULSE_SEQUENCE = True
 RUN_EXPERIMENT = False
+
+
 
 if __name__ == "__main__":
 	#expConfigFile = 'ESRconfig'

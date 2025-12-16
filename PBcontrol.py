@@ -45,8 +45,8 @@ def pb_inst_pbonly(flags,inst,inst_data,length):
 	length = c_double(length)
 	return spinapi.pb_inst_pbonly(flags, inst, inst_data, length)
 	
-def programPB(sequence,sequenceArgs):
-	channels=seqCtl.makeSequence(sequence, sequenceArgs)
+def programPB(sequence, sequenceArgs, use_SPC:bool = False):
+	channels=seqCtl.makeSequence(sequence, sequenceArgs, use_SPC)
 	channelBitMasks = seqCtl.sequenceEventCataloguer(channels)
 	instructionArray=programSequence(channelBitMasks)
 	return instructionArray

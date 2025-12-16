@@ -243,6 +243,7 @@ def runExperiment(expConfigFile):
 			expConfigFile = expConfigFile.value
 		expCfg = import_module(expConfigFile)
 		expCfg.N_scanPts = len(expCfg.scannedParam) #protection against non-integer user inputs for N_scanPts.
+		use_SPC = expCfg.use_SPC
 		validateUserInput(expCfg)
 		#Check if save directory exists, and, if not, creates a "Saved Data" folder in the current directory, where all data will be saved.
 		if not (os.path.isdir(expCfg.savePath)):
@@ -260,11 +261,11 @@ def runExperiment(expConfigFile):
 			#Program PB
 			seqArgList = [expCfg.scannedParam[-1]]
 			seqArgList.extend(sequenceArgs)
-			instructionArray=PBctl.programPB(expCfg.sequence,seqArgList)
+			instructionArray=PBctl.programPB(expCfg.sequence, seqArgList, use_SPC=use_SPC)
 		else:
 			SRSctl.setSRS_Freq(SRS, expCfg.scannedParam[0])
 			#Program PB
-			instructionArray=PBctl.programPB(expCfg.sequence,sequenceArgs)
+			instructionArray=PBctl.programPB(expCfg.sequence,sequenceArgs, use_SPC=use_SPC)
 		SRSctl.enableSRS_RFOutput(SRS)
 					
 		#Configure DAQ
@@ -308,7 +309,7 @@ def runExperiment(expConfigFile):
 					SRSctl.setSRS_Freq(SRS, expCfg.scannedParam[i_scanPoint])
 				else:
 					seqArgList[0] = expCfg.scannedParam[i_scanPoint]
-					instructionArray= PBctl.programPB(expCfg.sequence,seqArgList)
+					instructionArray= PBctl.programPB(expCfg.sequence,seqArgList, use_SPC=use_SPC)
 
 				#read DAQ
 				start_time = time.time()

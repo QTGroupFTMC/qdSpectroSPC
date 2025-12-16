@@ -92,13 +92,15 @@ from connectionConfig import *
 t_min = 1e3/PBclk #in ns
 #-------------------------  USER INPUT  ---------------------------------------#
 
+# Detector choice: use single photon counters instead of analog input (instead of diode, for example)
+use_SPC = True
 # Microwave scan parameters:----------------------------------------------------
 # Start pulse duration (in nanoseconds):
 startPulseDuration = 0
 # End pulse duration (in nanoseconds):
 endPulseDuration = 1000
 # Number of pulse length steps:
-N_scanPts =500
+N_scanPts = 500
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
 microwavePower = -20 #default 5
 # Microwave frequency (Hz):

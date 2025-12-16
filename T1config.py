@@ -83,6 +83,9 @@ from connectionConfig import *
 t_min = 1e3/PBclk #in ns
 
 #-------------------------  USER INPUT  ---------------------------------------#
+
+# Detector choice: use single photon counters instead of analog input (instead of diode, for example)
+use_SPC = False
 # Microwave scan parameters:----------------------------------------------------
 # Start pulse duration (in nanoseconds). Note: if 
 # start_t<(t_readoutDelay + 2*t_min*round((1*us)/t_min) + t_pi), it will be shifted by

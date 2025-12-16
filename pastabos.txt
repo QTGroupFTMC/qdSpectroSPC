@@ -158,6 +158,17 @@ minimalus intervalas tarp readoutu yra 100ns; padekim ji ties 1000ns
 Rabi seka turi buti modifikuota SPC
 
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+du main control:
+mainControl.py
+mainControl_wo_DAQ.py
+
+
+pirmas programPB() yra skirti tiesiog plotinimui
+   du instances, priklausomai nuo to, ar ESR, ar ne
+
+po to cikle - tik vienas programPB(), nes ESR neperprogramuoja jo
+
 
 
 

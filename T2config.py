@@ -87,6 +87,8 @@ from connectionConfig import *
 t_min = 1e3/PBclk #in ns
 #-------------------------  USER INPUT  ---------------------------------------#
 
+# Detector choice: use single photon counters instead of analog input (instead of diode, for example)
+use_SPC = False
 # Scan parameters:-------------------------------------------------------------
 # Start delay duration (in nanoseconds):
 startTau =208*2
