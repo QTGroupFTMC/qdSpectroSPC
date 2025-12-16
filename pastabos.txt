@@ -1,0 +1,163 @@
+sequenceArgs:
+ESR: [t_duration]
+Rabi: [t_AOM,t_readoutDelay]
+T2: [t_AOM,t_readoutDelay,t_pi,IQpadding,numberOfPiPulses]
+
+
+ESR:
+  seq_arg_list = [last_mw_freq, t_duration]
+
+
+PBcontrol.py
+  .programPB('ESRseq', 400000.0)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pulse sequences
+  
+
+
+
+Paziurim visus ESR pulse sequence parametrus
+sequenceControl.py
+  makeESRseq
+
+
+t_duration = 400us4:44 PM 12/15/2025
+ns = 1, us = 1000, tai visas sequence laikas realiai yra ns
+
+Kanalas: (idx, start, duration)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ESR:
+makeESRseq()
+trumpi skaiciai yra apvalinti i sveika 500MHz ciklu skaiciu
+
+Ciklas:
+  t_duration = 400us= 400_000ns
+  t_sigAndref = 2 * t_duration = 800us - pilnas ciklas
+
+Readout:
+  t_readout_buffer  = 2000ns  (isskaitymo laikas)
+
+Trigeriu trukme:
+  t_startTrig = 300ns - START trig pulse length
+  t_readout = 300ns   - DAQ trig pulse length
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DAQchannel = puse_periodo - t_readoutBuffer, periodas - t_readoutBuffer 
+
+Rabi:
+sequenceArgs = [t_AOM,t_readoutDelay]
+scanned parame - microwave pulse duration; 0-1000ns
+scanned_param = scannedParam = np.linspace(startPulseDuration,endPulseDuration, N_scanPts, endpoint=True) 
+seq_arg_list[scanned_param_last_value, t_AOM,t_readoutDelay] -> sitas pasiduoda i sekos generatoriu
+
+start_delay = 1000
+t_readoutDelay = 2300
+
+Trigeriu trukme:
+  t_startTrig = 300
+
+Delays:
+  uWtoAOM_delay = 1000
+
+Parametras:
+  t_AOM = 50_000
+
+
+signaline ciklo puse: trukmr
+  startas +   MW    + tarpas tarp MW ir AOM + AOM
+    1000  + 0..1000 +  		1000	    + 50_000 
+
+DAQ: ijungus AOM palaukiam t_readoutDelay = 2300us; readout = 300ns
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Papildomi klausimai
+ESR
+1. Check readout - ar mums uztenka laiko?
+Nsamples = 1000 - paketo originale
+pas mus dabar Nsamples = 2000
+
+DAQ_MaxSamplingRate_SPC = 1_250_000
+
+800ns/readout - pasitikrinsim praktiskai, kiek readout trunka
+
+1000 samples: 800us (???)
+
+
+Perziurim DAQ konfiguracija
+readTask.timing.cfg_samp_clk_timing(DAQ_MaxSamplingRate,DAQ_SampleClk,Edge.RISING,AcquisitionType.FINITE, NsampsPerDAQread)
+
+DAQ_SampleClk
+DAQ_SampleClk = "PFI3"
+
+Ok, tai toks ispudis, kad:
+
+DAQcontrol
+  configureDAQ
+    sukuria readTask su 2*Nsamples
+    nustato external sample clock - is fizinio kanalo "PFI3"
+kas reiskia, kad per viena matavimo cikla mes paimam tik 2 vertes - viena signal, viena ref
+
+
+ar tada susije Nsamples ir experimento run ciklas?
+
+expCfg.Navg
+  original expCfg.Navg=1
+
+Bus susije taip - kai is mainControl issaukiam
+cts=DAQctl.readDAQ(DAQtask,2*expCfg.Nsamples,expCfg.DAQtimeout)
+jis sukasi iki Nsamples, trigerinamas pulse blasterio.
+
+Kiekvienam cikle nuskaito tik po dvi vertes - sig ir ref
+Sukasi iki buferio dydzio
+
+
+Del visa ko sutikrinam pulse blasterio kanalus, kad tikrai butu taip:
+
+start_trig - 2
+isskaitymas - 3
+
+Pulse blaster -> connector       is connectionConfig
+Bit2 (PB) - User2 - PFI8 (DAQ connector) -> DAQ_StartTrig
+Bit3 (PB) - User1 - PFI3 (DAQ connector) -> DAQ_SampleClk
+
+
+Ka daro start_trig? jis nestartuoja readTask
+
+Start_trigger yra single shot dalykas, ji pagauna, ir tada visus likusius ignoruoja. Tai cia viskas ok.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"Klasikine" ESR uzduotis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Start trigeris ir du sample clock impulsai per cikla
+DAQ readTask paima tik pirmo ciklo start trigeri
+tada kiekvienam cikle DAQ nusiskaito po viena verte - 2*Nsamples 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2. patikrinam, ar mano ESR logika buvo tokia pat
+
+Taip, trigerio ir sample clock atzvilgiu - visai tokia pat
+
+3. Patikrinam, kas vyksta su counteriu, kai trigerinam sample clock
+tai counteris yra free running, ir ties sample clock mes tiesiog isskaitome jo verte
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Persitikrinti
+koks yra musu DAQ counter max rate?
+
+counter resolution yra 32 bits - 4e9 countu turbut
+
+Counteriai naudoja 100MHz time base
+Bet skaiciavimo tipiskas max daznis yra 10MHz
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+minimalus intervalas tarp readoutu yra 100ns; padekim ji ties 1000ns
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Rabi seka turi buti modifikuota SPC
+
+
+
+
+

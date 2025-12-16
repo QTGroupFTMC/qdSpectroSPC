@@ -100,7 +100,7 @@ endPulseDuration = 1000
 # Number of pulse length steps:
 N_scanPts =500
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
-microwavePower = 5
+microwavePower = -20 #default 5
 # Microwave frequency (Hz):
 microwaveFrequency = 2.7351e9 
 # Pulse sequence parameters:----------------------------------------------------

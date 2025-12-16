@@ -32,18 +32,19 @@ class MeasurementConfig(Enum):
 	T2:str = 'T2config'
 	XY8:str = 'XY8config'
 
+PLOT_PULSE_SEQUENCE = True
+RUN_EXPERIMENT = False
+
 if __name__ == "__main__":
 	#expConfigFile = 'ESRconfig'
-	PLOT_PULSE_SEQUENCE = True
-	RUN_EXPERIMENT = False
-	expConfigFile_enum=MeasurementConfig.XY8
+
+	expConfigFile_enum=MeasurementConfig.RABI
 	expConfigFile = expConfigFile_enum.value
 	expCfg = import_module(expConfigFile)	
 
-
 	sequence = expCfg.sequence
-	pulse_seq = expCfg.plotPulseSequence
-	sequenceArgs = expCfg.updateSequenceArgs()
+	plot_pulse_seq = expCfg.plotPulseSequence
+	sequenceArgs = expCfg.updateSequenceArgs()  # duration for ESR
 	expParamList = expCfg.updateExpParamList()
 	pb_channels = expCfg.PBchannels
 	
@@ -51,11 +52,10 @@ if __name__ == "__main__":
 	seq_arg_list.extend(sequenceArgs)
 
 	# Pulse Blaster must be on for this to work
-	if sequence != 'ESRseq':
-		instructionArray=PBctl.programPB(sequence,seq_arg_list)
-	else:
-		#Program PB
+	if sequence == 'ESRseq':
 		instructionArray=PBctl.programPB(sequence,sequenceArgs)
+	else:
+		instructionArray=PBctl.programPB(sequence,seq_arg_list)		
 
 
 	if PLOT_PULSE_SEQUENCE:
