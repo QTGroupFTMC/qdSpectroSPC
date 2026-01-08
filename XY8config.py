@@ -97,7 +97,7 @@ endTau = 480
 # Number of delay steps:
 N_scanPts = 45
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
-microwavePower = -5
+microwavePower = -20
 # Microwave frequency (Hz):
 microwaveFrequency = 2e9 
 # Pulse sequence parameters:----------------------------------------------------

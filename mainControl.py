@@ -301,9 +301,12 @@ def runExperiment(expConfigFile):
 		background = np.zeros([expCfg.N_scanPts,expCfg.Navg])
 		contrast = np.zeros([expCfg.N_scanPts,expCfg.Navg])
 
+
+		start_time = time.perf_counter()
 		#Run experiment
 		for i_run in range (0,expCfg.Navg):
 			print('Run ',i_run+1,' of ',expCfg.Navg)
+			cycle_start_time = time.perf_counter()
 			if expCfg.randomize:
 				if i_run>0:
 					shuffle(expCfg.scannedParam)
@@ -321,13 +324,25 @@ def runExperiment(expConfigFile):
 					cts_np = np.array(cts)
 
 					cts_in_interval = cts_np[1::2] - cts_np[0::2] # inteval_counts = end_count_val - start_count_val
-					sig = list(cts_in_interval[1::2])
-					bkgnd = list(cts_in_interval[0::2])
+					
+					bkgnd = list(cts_in_interval[1::2])
+					sig = list(cts_in_interval[0::2])
+
+					# probably flipped?
+					#sig = list(cts_in_interval[1::2])
+					#bkgnd = list(cts_in_interval[0::2])
 
 				else:
 					cts = DAQctl.readDAQ(DAQtask,2*expCfg.Nsamples,expCfg.DAQtimeout)
 					sig = cts[0::2]
 					bkgnd = cts[1::2]
+
+				mean_sig = np.mean(sig)
+				std_sig = np.std(sig)
+				mean_bg = np.mean(bkgnd)
+				std_bg = np.std(bkgnd)
+				print(f'{mean_sig = } {std_sig = }')
+				print(f'{mean_bg = } {std_bg = }')
 
 				#Take average of counts
 				meanSignalCurrentRun[i_scanPoint] = np.mean(sig)
@@ -359,7 +374,9 @@ def runExperiment(expConfigFile):
 						paramFile.write(expCfg.formattingSaveString % tuple(expParamList))
 						dataFile.close()
 						paramFile.close()
-					
+			cycle_time = time.perf_counter() - cycle_start_time
+			print(f'Cycle {i_run+1} time {cycle_time} s')
+
 			#Sort current run counts in order of increasing delay
 			dataCurrentRun = np.transpose(np.array([expCfg.scannedParam,meanSignalCurrentRun,meanBackgroundCurrentRun,contrastCurrentRun]))
 			sortingIndices = np.argsort(dataCurrentRun[:,0])
@@ -398,7 +415,9 @@ def runExperiment(expConfigFile):
 				paramFile.write(expCfg.formattingSaveString % tuple(expParamList))
 				dataFile.close()
 				paramFile.close()
-		
+		full_duration =  time.perf_counter() - start_time
+		print(f'Measurement time {full_duration} s')
+
 		#Turn off SRS output
 		SRSctl.disableSRS_RFOutput(SRS)
 

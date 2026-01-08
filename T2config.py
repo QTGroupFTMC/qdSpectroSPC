@@ -88,30 +88,30 @@ t_min = 1e3/PBclk #in ns
 #-------------------------  USER INPUT  ---------------------------------------#
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
-use_SPC = False
-t_count_duration = 1000
+use_SPC = True
+t_count_duration = 10*us
 # Scan parameters:-------------------------------------------------------------
 # Start delay duration (in nanoseconds):
 startTau =208*2
 # End delay duration (in nanoseconds):
-endTau = 4000
+endTau = 2000
 # Number of delay steps:
 N_scanPts = 50
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
-microwavePower = 4
+microwavePower = 5
 # Microwave frequency (Hz):
-microwaveFrequency = 2.916e9 
+microwaveFrequency = 2.729e9 
 # Pulse sequence parameters:----------------------------------------------------
 # AOM pulse duration (in ns)
-t_AOM= 50*us
+t_AOM= 100*us
 # Readout delay (in ns)
 t_readoutDelay = 2.3*us
 # Pi-pulse duration (in ns)
-t_pi = 170
+t_pi = 74
 # Number of pi pulses:
 numberOfPiPulses = 2
 # Number of fluorescence measurement samples to take at each delay point:
-Nsamples = 10000
+Nsamples = 40_000
 # Number of averaging runs to do:
 Navg = 1
 #DAQ timeout, in seconds:

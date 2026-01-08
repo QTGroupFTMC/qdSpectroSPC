@@ -27,6 +27,7 @@ class MeasurementConfig(Enum):
 	COR_SPECT:str = 'correlSpecconfig'
 	ESR: str = 'ESRconfig'
 	OPT_READ_DELAY: str = 'optimReadoutDelay'    # neplotina impulsu sekos, paziureti
+	REPOL_SLOW:str = 'repolarizationConfig_slow'
 	RABI:str = 'Rabiconfig'
 	T1:str = 'T1config'
 	T2:str = 'T2config'
@@ -50,7 +51,8 @@ RUN_EXPERIMENT = False
 if __name__ == "__main__":
 	#expConfigFile = 'ESRconfig'
 
-	expConfigFile_enum=MeasurementConfig.RABI
+	expConfigFile_enum=MeasurementConfig.REPOL_SLOW
+	
 	expConfigFile = expConfigFile_enum.value
 	expCfg = import_module(expConfigFile)	
 
@@ -65,9 +67,9 @@ if __name__ == "__main__":
 
 	# Pulse Blaster must be on for this to work
 	if sequence == 'ESRseq':
-		instructionArray=PBctl.programPB(sequence,sequenceArgs)
+		instructionArray=PBctl.programPB(sequence,sequenceArgs,use_SPC=True)
 	else:
-		instructionArray=PBctl.programPB(sequence,seq_arg_list)		
+		instructionArray=PBctl.programPB(sequence,seq_arg_list,use_SPC=True)		
 
 
 	if PLOT_PULSE_SEQUENCE:

@@ -114,15 +114,15 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = True
-t_count_duration = 1000 # photon counting interval at each measurement half-cycle
+t_count_duration = 300*us # photon counting interval at each measurement half-cycle
 
 # Microwave scan parameters:----------------------------------------------------
 # Start frequency (in Hz):
-startFreq = 2.9e9
+startFreq = 2.84e9
 # End frequency (in Hz):
-endFreq = 3e9		#2.93e9
+endFreq = 2.9e9		#2.93e9
 # Number of frequency steps:
-N_scanPts = 200
+N_scanPts = 100
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
 microwavePower = -5
 # Pulse sequence parameters:----------------------------------------------------

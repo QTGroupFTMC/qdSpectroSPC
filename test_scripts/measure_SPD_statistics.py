@@ -290,10 +290,10 @@ if __name__ == '__main__':
                     np.savetxt(f, delta_cts.reshape(-1, 1), fmt="%.1f")
         if SAVE_RESULTS:
 			# save paramters
-            with open(PAR_SAVE_PATH, "w") as f: 
-                for key, value in params.items(): 
-                    val, scaling_factor, unit = value
-                    if scaling_factor is not None:
-                        val = val/scaling_factor
-                    f.write(f"{key} = {val} {unit}\n")
+			with open(PAR_SAVE_PATH, "w") as f: 
+				for key, value in params.items(): 
+					val, scaling_factor, unit = value
+					if scaling_factor is not None:
+						val = val/scaling_factor
+					f.write(f"{key} = {val} {unit}\n")
     a = 1

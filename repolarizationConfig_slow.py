@@ -22,16 +22,9 @@
 # SOFTWARE.
 
 """
-Rabi experiment config
+Repolarization experiment config
+wait until the system depolarizes by itself, repolarizew it with green and measure repolarization kinetics
 
-This script can be used to configure mainControl.py to run a Rabi experiment. Fluorescence emitted by an NV diamond 
-sample is recorded as a function of the duration of a microwave drive pulse, and the data is saved as a tabulated 
-text file (see below for saving options). The microwave pulse duration is scanned from startPulseDuration to 
-endPulseDuration in N_scanPts steps. At each scan point, the script takes 2*Nsamples fluorescence readings, turning
- the microwaves on and off for successive samples in order to establish the background fluorescence level. We hence 
- have Nsamples with microwaves on (signal counts) and Nsamples with microwaves off (background, or reference, counts). 
- After the first scan over pulse durations is complete, the script proceeds to repeat the scan Navg times, averaging 
- the contrast at each scan point over all runs (see below for contrast definitions and averaging options).
 
 -- Contrast setting --
 From signal and background counts, the script will calculate contrast based on one of two formulas, 
@@ -94,21 +87,23 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = True
-t_count_duration = 50*us # photon counting interval at each measurement half-cycle
-# Microwave scan parameters:----------------------------------------------------
-# Start pulse duration (in nanoseconds):
-startPulseDuration = 0
-# End pulse duration (in nanoseconds):
-endPulseDuration = 150
+t_count_duration = 1*us # photon counting interval at each measurement half-cycle
+# Readout_delay scan parameters:----------------------------------------------------
+# Start delay (in nanoseconds):
+start_delay = 0
+end_delay = 3000
+
 # Number of pulse length steps:
 N_scanPts = 75
 # Microwave power output from SRS(dBm) - DO NOT EXCEED YOUR AMPLIFIER'S MAXIMUM INPUT POWER:
-microwavePower = 5
+microwavePower = 20
 # Microwave frequency (Hz):
 microwaveFrequency = 2.729e9 
 # Pulse sequence parameters:----------------------------------------------------
+ 
 # AOM pulse duration (ns)
-t_AOM = 100*us
+t_dark = 100*us
+t_AOM = 50*us
 # Readout delay (ns)
 t_readoutDelay = 2.3*us
 # Number of fluorescence measurement samples to take at each pulse length point:
@@ -137,7 +132,7 @@ saveSpacing_inAverages = 3
 # Path to folder where data will be saved:
 savePath = os.getcwd()+"\\Saved_Data\\"
 # File name for data file
-saveFileName = "Rabi_"
+saveFileName = "RepolarizationSlow_"
 # Averaging options:------------------------------------------------------------
 # Option to do shot by shot contrast normalization:
 shotByShotNormalization = False
@@ -145,17 +140,17 @@ shotByShotNormalization = False
 randomize = True
 #------------------------- END OF USER INPUT ----------------------------------#
 
-scannedParam = np.linspace(startPulseDuration,endPulseDuration, N_scanPts, endpoint=True) 
+scannedParam = np.linspace(start_delay, end_delay, N_scanPts, endpoint=True) 
 #Sequence string:
-sequence = 'RabiSeq'
+sequence = 'RepolSeqSlow'
 #Scan start Name
-scanStartName = 'startPulseDuration'
+scanStartName = 'start_delay'
 #Scan end Name
-scanEndName = 'endPulseDuration'
+scanEndName = 'end_delay'
 #PB channels
 PBchannels = {'AOM':AOM,'uW':uW,'DAQ':DAQ,'STARTtrig':STARTtrig}
 #Sequence args
-sequenceArgs = [t_AOM,t_readoutDelay, t_count_duration]
+sequenceArgs = [t_AOM, t_dark, t_readoutDelay, t_count_duration]
 #Make save file path
 dateTimeStr = strftime("%Y-%m-%d_%Hh%Mm%Ss", localtime())
 dataFileName = savePath + saveFileName+ dateTimeStr +".txt"
@@ -163,12 +158,42 @@ dataFileName = savePath + saveFileName+ dateTimeStr +".txt"
 paramFileName = savePath + saveFileName+dateTimeStr+'_PARAMS'+".txt"
 #Param file save settings
 formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%r\n%s\t%r\n%s\t%r\n%s\t%d\n%s\t%d\n%s\t%s\n"
-expParamList = ['N_timePts:',N_scanPts,'Navg:',Navg,'Nsamples:',Nsamples,'startPulseDuration:',scannedParam[0],'endPulseDuration:',scannedParam[-1],'microwavePower:',microwavePower,'microwaveFrequency',microwaveFrequency,'t_AOM:',t_AOM, 't_readoutDelay:',t_readoutDelay,'shotByShotNormalization:',shotByShotNormalization,'randomize:',randomize,'plotPulseSequence:',plotPulseSequence,'saveSpacing_inScanPts:',saveSpacing_inScanPts,'saveSpacing_inAverages:',saveSpacing_inAverages,'dataFileName:',dataFileName]
+expParamList = ['N_timePts:',N_scanPts,
+				'Navg:',Navg,
+				'Nsamples:',Nsamples,
+				'startPulseDuration:',scannedParam[0],
+				'endPulseDuration:',scannedParam[-1],
+				'microwavePower:',microwavePower,
+				'microwaveFrequency',microwaveFrequency,
+				't_AOM:',t_AOM, 
+				't_dark:',t_dark, 
+				't_readoutDelay:',t_readoutDelay,
+				'shotByShotNormalization:',shotByShotNormalization,
+				'randomize:',randomize,
+				'plotPulseSequence:',plotPulseSequence,
+				'saveSpacing_inScanPts:',saveSpacing_inScanPts,
+				'saveSpacing_inAverages:',saveSpacing_inAverages,
+				'dataFileName:',dataFileName]
 
 def updateSequenceArgs():
-	sequenceArgs = [t_AOM, t_readoutDelay, t_count_duration]
+	sequenceArgs = [t_AOM, t_dark, t_readoutDelay, t_count_duration]
 	return sequenceArgs
 	
 def updateExpParamList():
-	expParamList = ['N_timePts:',N_scanPts,'Navg:',Navg,'Nsamples:',Nsamples,'startPulseDuration:',scannedParam[0],'endPulseDuration:',scannedParam[-1],'microwavePower:',microwavePower,'microwaveFrequency',microwaveFrequency,'t_AOM:',t_AOM, 't_readoutDelay:',t_readoutDelay,'shotByShotNormalization:',shotByShotNormalization,'randomize:',randomize,'plotPulseSequence:',plotPulseSequence,'saveSpacing_inScanPts:',saveSpacing_inScanPts,'saveSpacing_inAverages:',saveSpacing_inAverages,'dataFileName:',dataFileName]
+	expParamList = ['N_timePts:',N_scanPts,
+				 	'Navg:',Navg,
+					'Nsamples:',Nsamples,
+					'startPulseDuration:',scannedParam[0],
+					'endPulseDuration:',scannedParam[-1],
+					'microwavePower:',microwavePower,
+					'microwaveFrequency',microwaveFrequency,
+					't_AOM:',t_AOM, 
+					't_dark:',t_dark, 
+					't_readoutDelay:',t_readoutDelay,
+					'shotByShotNormalization:',shotByShotNormalization,
+					'randomize:',randomize,
+					'plotPulseSequence:',plotPulseSequence,
+					'saveSpacing_inScanPts:',saveSpacing_inScanPts,
+					'saveSpacing_inAverages:',saveSpacing_inAverages,
+					'dataFileName:',dataFileName]
 	return expParamList
