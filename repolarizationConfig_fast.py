@@ -99,10 +99,11 @@ N_scanPts = 75
 microwavePower = -20
 # Microwave frequency (Hz):
 microwaveFrequency = 2.729e9 
+# Pi-pulse duration (in ns)
+t_pi = 170*ns
 # Pulse sequence parameters:----------------------------------------------------
  
 # AOM pulse duration (ns)
-t_dark = 100*us
 t_AOM = 50*us
 # Readout delay (ns)
 t_readoutDelay = 2.3*us
@@ -132,7 +133,7 @@ saveSpacing_inAverages = 3
 # Path to folder where data will be saved:
 savePath = os.getcwd()+"\\Saved_Data\\"
 # File name for data file
-saveFileName = "RepolarizationSlow_"
+saveFileName = "RepolarizationFast_"
 # Averaging options:------------------------------------------------------------
 # Option to do shot by shot contrast normalization:
 shotByShotNormalization = False
@@ -142,7 +143,7 @@ randomize = True
 
 scannedParam = np.linspace(start_delay, end_delay, N_scanPts, endpoint=True) 
 #Sequence string:
-sequence = 'RepolSeqSlow'
+sequence = 'RepolSeqFast'
 #Scan start Name
 scanStartName = 'start_delay'
 #Scan end Name
@@ -150,7 +151,7 @@ scanEndName = 'end_delay'
 #PB channels
 PBchannels = {'AOM':AOM,'uW':uW,'DAQ':DAQ,'STARTtrig':STARTtrig}
 #Sequence args
-sequenceArgs = [t_AOM, t_dark, t_readoutDelay, t_count_duration]
+sequenceArgs = [t_AOM, t_readoutDelay, t_pi, t_count_duration]
 #Make save file path
 dateTimeStr = strftime("%Y-%m-%d_%Hh%Mm%Ss", localtime())
 dataFileName = savePath + saveFileName+ dateTimeStr +".txt"
@@ -166,8 +167,8 @@ expParamList = ['N_timePts:',N_scanPts,
 				'microwavePower:',microwavePower,
 				'microwaveFrequency',microwaveFrequency,
 				't_AOM:',t_AOM, 
-				't_dark:',t_dark, 
 				't_readoutDelay:',t_readoutDelay,
+				't_pi:',t_pi,
 				'shotByShotNormalization:',shotByShotNormalization,
 				'randomize:',randomize,
 				'plotPulseSequence:',plotPulseSequence,
@@ -176,7 +177,7 @@ expParamList = ['N_timePts:',N_scanPts,
 				'dataFileName:',dataFileName]
 
 def updateSequenceArgs():
-	sequenceArgs = [t_AOM, t_dark, t_readoutDelay, t_count_duration]
+	sequenceArgs = [t_AOM, t_readoutDelay, t_pi, t_count_duration]
 	return sequenceArgs
 	
 def updateExpParamList():
@@ -188,8 +189,8 @@ def updateExpParamList():
 					'microwavePower:',microwavePower,
 					'microwaveFrequency',microwaveFrequency,
 					't_AOM:',t_AOM, 
-					't_dark:',t_dark, 
 					't_readoutDelay:',t_readoutDelay,
+					't_pi',t_pi,
 					'shotByShotNormalization:',shotByShotNormalization,
 					'randomize:',randomize,
 					'plotPulseSequence:',plotPulseSequence,

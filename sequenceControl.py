@@ -97,6 +97,8 @@ def makeSequence(sequence, args:list, use_SPC:bool):
 		return makeESRseq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'RepolSeqSlow':
 		return makeRepolarizationSlowSeq(*args, make_SPC_sequence=use_SPC)
+	elif sequence == 'RepolSeqFast':
+		return makeRepolarizationFastSeq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'RabiSeq':
 		return makeRabiSeq(*args, make_SPC_sequence=use_SPC)
 	elif sequence == 'T1seq':
@@ -157,6 +159,44 @@ def makeReadoutDelaySweep(t_readoutDelay, t_AOM, make_SPC_sequence:bool = False)
 	DAQchannel = PBchannel(DAQ,[start_delay+t_readoutDelay],[t_readout])
 	STARTtrigchannel = PBchannel(STARTtrig,[start_delay+t_AOM],[2*t_min*round(5*us/t_min)+t_startTrig])
 	channels=[AOMchannel,DAQchannel, STARTtrigchannel]
+	return channels
+
+def makeRepolarizationFastSeq(t_delay, t_AOM, t_readoutDelay, t_pi, t_count_duration, make_SPC_sequence:bool = False)->list[PBchannel]:
+	start_delay = t_min*round(1*us/t_min) + t_readoutDelay
+	t_startTrig = t_min*round(300*ns/t_min)
+	t_readout = t_min*round(300*ns/t_min)	
+
+	separator = t_min*round(1*us/t_min)
+
+	channels = []
+
+	# MW channel
+	t_piby2=t_pi/2
+	uWchannel = PBchannel(uW,[start_delay],[t_piby2])
+
+	# AOM channel
+	t_AOM_start = start_delay + t_piby2 + separator
+	AOMchannel = PBchannel(AOM,[t_AOM_start],[t_AOM])	
+
+	# DAQ channel
+	signal_readout_start_count = t_AOM_start + t_readoutDelay + t_delay
+	signal_readout_end_count = signal_readout_start_count + t_count_duration
+	#reference_readpout_start = t_AOM_start + t_AOM + t_readoutDelay - t_count_duration*2  # can seem to be outside, because the DAQ pulse is delayed by t_readoutDelay with respect to AOM
+	reference_readpout_start_count = t_AOM_start + t_AOM - t_count_duration*2
+	reference_readpout_end_count = reference_readpout_start_count + t_count_duration
+	
+	DAQ_start_times = [
+		signal_readout_start_count, 
+		signal_readout_end_count, 
+		reference_readpout_start_count, 
+		reference_readpout_end_count,
+		]
+	DAQchannel = PBchannel(DAQ, DAQ_start_times, [t_readout, t_readout, t_readout, t_readout])
+
+	# START trigger channel
+	STARTtrigchannel = PBchannel(STARTtrig,[0],[t_startTrig])
+	channels = [uWchannel,AOMchannel,DAQchannel, STARTtrigchannel]
+
 	return channels
 
 def makeRepolarizationSlowSeq(t_delay, t_AOM, t_dark, t_readoutDelay, t_count_duration, make_SPC_sequence:bool = False)->list[PBchannel]:

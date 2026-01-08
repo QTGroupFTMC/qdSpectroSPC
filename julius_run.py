@@ -28,6 +28,7 @@ class MeasurementConfig(Enum):
 	ESR: str = 'ESRconfig'
 	OPT_READ_DELAY: str = 'optimReadoutDelay'    # neplotina impulsu sekos, paziureti
 	REPOL_SLOW:str = 'repolarizationConfig_slow'
+	REPOL_FAST:str = 'repolarizationConfig_fast'
 	RABI:str = 'Rabiconfig'
 	T1:str = 'T1config'
 	T2:str = 'T2config'
@@ -52,6 +53,7 @@ if __name__ == "__main__":
 	#expConfigFile = 'ESRconfig'
 
 	expConfigFile_enum=MeasurementConfig.REPOL_SLOW
+	expConfigFile_enum=MeasurementConfig.REPOL_FAST
 	
 	expConfigFile = expConfigFile_enum.value
 	expCfg = import_module(expConfigFile)	
