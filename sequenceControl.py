@@ -286,16 +286,29 @@ def makeRabiSeq(t_uW, t_AOM, t_readoutDelay, t_count_duration, make_SPC_sequence
 	channels.extend([AOMchannel,DAQchannel, STARTtrigchannel])
 	return channels
 
-def makeT1Seq(t_delay, t_AOM, t_readoutDelay, t_pi, make_SPC_sequence:bool = False)->list[PBchannel]:
+def makeT1Seq(t_delay, t_AOM, t_readoutDelay, t_count_duration, t_pi, make_SPC_sequence:bool = False)->list[PBchannel]:
 	t_startTrig = t_min*round(300*ns/t_min)
 	t_readout = t_min*round(300*ns/t_min)
-	uWtoAOM_delay =t_min*round(1*us/t_min)
+	uWtoAOM_delay = t_min*round(1*us/t_min)
+	
 	AOMstartTime1 = t_delay
-	firstHalfDuration=AOMstartTime1+t_AOM
-	AOMstartTime2 =  firstHalfDuration+AOMstartTime1 
-	AOMchannel = PBchannel(AOM,[AOMstartTime1,AOMstartTime2],[t_AOM,t_AOM])
-	uWchannel = PBchannel(uW,[firstHalfDuration +t_readoutDelay + t_min*round(1*us/t_min)],[t_pi])
-	DAQchannel = PBchannel(DAQ,[AOMstartTime1+t_readoutDelay, AOMstartTime2+t_readoutDelay],[t_readout,t_readout])
+		firstHalfDuration=AOMstartTime1+t_AOM
+		AOMstartTime2 =  firstHalfDuration+AOMstartTime1 
+		AOMchannel = PBchannel(AOM,[AOMstartTime1,AOMstartTime2],[t_AOM,t_AOM])
+		uWchannel = PBchannel(uW,[firstHalfDuration +t_readoutDelay + t_min*round(1*us/t_min)],[t_pi])
+	
+	if make_SPC_sequence:
+		start_count_sig = AOMstartTime1+t_readoutDelay
+		end_count_sig = start_count_sig + t_count_duration
+		start_count_ref = AOMstartTime2+t_readoutDelay
+		end_count_ref = start_count_ref + t_count_duration
+		start_times = [start_count_sig, end_count_sig, start_count_ref, end_count_ref]
+		durations = [t_readout]*4
+	else:
+		start_times = [, ]
+		durations = [t_readout]*2
+	
+	DAQchannel = PBchannel(DAQ,start_times, durations)
 	STARTtrigchannel = PBchannel(STARTtrig,[0],[t_startTrig])
 	channels = [AOMchannel,DAQchannel,uWchannel, STARTtrigchannel]
 	return channels

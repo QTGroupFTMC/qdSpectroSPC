@@ -86,6 +86,7 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = False
+t_count_duration = 1*us # photon counting interval at each measurement half-cycle
 # Microwave scan parameters:----------------------------------------------------
 # Start pulse duration (in nanoseconds). Note: if 
 # start_t<(t_readoutDelay + 2*t_min*round((1*us)/t_min) + t_pi), it will be shifted by
@@ -150,7 +151,7 @@ scanStartName = 'start_t'
 #Scan end Name
 scanEndName = 'end_t'
 #Sequence arguments:
-sequenceArgs = [t_AOM,t_readoutDelay,t_pi]
+sequenceArgs = [t_AOM,t_readoutDelay,t_count_duration,t_pi]
 #PB channels
 PBchannels = {'AOM':AOM,'uW':uW,'DAQ':DAQ,'STARTtrig':STARTtrig}
 #Make save file path
@@ -159,13 +160,45 @@ dataFileName = savePath + saveFileName+ dateTimeStr +".txt"
 #Make param file path
 paramFileName = savePath + saveFileName+dateTimeStr+'_PARAMS'+".txt"
 #Param file save settings
-formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%r\n%s\t%r\n%s\t%r\n%s\t%d\n%s\t%d\n%s\t%s\n"
-expParamList = ['N_scanPts:',N_scanPts,'Navg:',Navg,'Nsamples:',Nsamples,'start_t:',scannedParam[0],'end_t:',scannedParam[-1],'microwavePower:',microwavePower,'microwaveFrequency',microwaveFrequency,'t_AOM:',t_AOM, 't_readoutDelay:',t_readoutDelay,'t_pi',t_pi,'shotByShotNormalization:',shotByShotNormalization,'randomize:',randomize,'plotPulseSequence:',plotPulseSequence,'saveSpacing_inScanPts:',saveSpacing_inScanPts,'saveSpacing_inAverages:',saveSpacing_inAverages,'dataFileName:',dataFileName]
+formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%r\n%s\t%r\n%s\t%r\n%s\t%d\n%s\t%d\n%s\t%s\n"
+expParamList = ['N_scanPts:',N_scanPts,
+				'Navg:',Navg,
+				't_count_duration', t_count_duration,
+				'Nsamples:',Nsamples,
+				'start_t:',scannedParam[0],
+				'end_t:',scannedParam[-1],
+				'microwavePower:',microwavePower,
+				'microwaveFrequency',microwaveFrequency,
+				't_AOM:',t_AOM, 
+				't_readoutDelay:',t_readoutDelay,
+				't_pi',t_pi,
+				'shotByShotNormalization:',shotByShotNormalization,
+				'randomize:',randomize,
+				'plotPulseSequence:',plotPulseSequence,
+				'saveSpacing_inScanPts:',saveSpacing_inScanPts,
+				'saveSpacing_inAverages:',saveSpacing_inAverages,
+				'dataFileName:',dataFileName]
 
 def updateSequenceArgs():
-	sequenceArgs = [t_AOM,t_readoutDelay,t_pi]
+	sequenceArgs = [t_AOM,t_readoutDelay, t_count_duration, t_pi]
 	return sequenceArgs
 	
 def updateExpParamList():
-	expParamList = ['N_scanPts:',N_scanPts,'Navg:',Navg,'Nsamples:',Nsamples,'start_t:',scannedParam[0],'end_t:',scannedParam[-1],'microwavePower:',microwavePower,'microwaveFrequency',microwaveFrequency,'t_AOM:',t_AOM, 't_readoutDelay:',t_readoutDelay,'t_pi',t_pi,'shotByShotNormalization:',shotByShotNormalization,'randomize:',randomize,'plotPulseSequence:',plotPulseSequence,'saveSpacing_inScanPts:',saveSpacing_inScanPts,'saveSpacing_inAverages:',saveSpacing_inAverages,'dataFileName:',dataFileName]
+	expParamList = ['N_scanPts:',N_scanPts,
+				 	'Navg:',Navg,
+					't_count_duration', t_count_duration,
+					'Nsamples:',Nsamples,
+					'start_t:',scannedParam[0],
+					'end_t:',scannedParam[-1],
+					'microwavePower:',microwavePower,
+					'microwaveFrequency',microwaveFrequency,
+					't_AOM:',t_AOM, 
+					't_readoutDelay:',t_readoutDelay,
+					't_pi',t_pi,
+					'shotByShotNormalization:',shotByShotNormalization,
+					'randomize:',randomize,
+					'plotPulseSequence:',plotPulseSequence,
+					'saveSpacing_inScanPts:',saveSpacing_inScanPts,
+					'saveSpacing_inAverages:',saveSpacing_inAverages,
+					'dataFileName:',dataFileName]
 	return expParamList

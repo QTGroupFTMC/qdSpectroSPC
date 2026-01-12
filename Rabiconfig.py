@@ -94,7 +94,7 @@ t_min = 1e3/PBclk #in ns
 
 # Detector choice: use single photon counters instead of analog input (instead of diode, for example)
 use_SPC = True
-t_count_duration = 50*us # photon counting interval at each measurement half-cycle
+t_count_duration = 1*us # photon counting interval at each measurement half-cycle
 # Microwave scan parameters:----------------------------------------------------
 # Start pulse duration (in nanoseconds):
 startPulseDuration = 0

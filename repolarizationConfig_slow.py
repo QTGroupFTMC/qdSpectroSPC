@@ -157,9 +157,10 @@ dataFileName = savePath + saveFileName+ dateTimeStr +".txt"
 #Make param file path
 paramFileName = savePath + saveFileName+dateTimeStr+'_PARAMS'+".txt"
 #Param file save settings
-formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%r\n%s\t%r\n%s\t%r\n%s\t%d\n%s\t%d\n%s\t%s\n"
+formattingSaveString = "%s\t%d\n%s\t%d\n%s\t%d\n%s\t%d\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%f\n%s\t%r\n%s\t%r\n%s\t%r\n%s\t%d\n%s\t%d\n%s\t%s\n"
 expParamList = ['N_timePts:',N_scanPts,
 				'Navg:',Navg,
+				't_count_duration', t_count_duration,
 				'Nsamples:',Nsamples,
 				'startPulseDuration:',scannedParam[0],
 				'endPulseDuration:',scannedParam[-1],
@@ -182,6 +183,7 @@ def updateSequenceArgs():
 def updateExpParamList():
 	expParamList = ['N_timePts:',N_scanPts,
 				 	'Navg:',Navg,
+					't_count_duration', t_count_duration,
 					'Nsamples:',Nsamples,
 					'startPulseDuration:',scannedParam[0],
 					'endPulseDuration:',scannedParam[-1],
