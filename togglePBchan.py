@@ -21,9 +21,11 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 from PBcontrol import *
 import numpy as np
 import sequenceControl as seqCtl
+from spinapi import Inst, PULSE_PROGRAM
 from connectionConfig import *
 PBchanDict = {'A': AOM, 'M': uW, 'D': DAQ, 'I': I, 'Q':Q, 'S':STARTtrig}
 deviceNameDict = {'A': 'AOM', 'M': 'Microwaves', 'D': 'DAQ gate', 'I': 'I', 'Q':'Q','S':'Start trigger'}
@@ -66,13 +68,11 @@ print('Press I to toggle I phase control')
 print('Press Q to toggle Q phase control \n')
 
 #Wait for user command:
-state= 0 # bit flag of devices which are currently on
-
-device = 'M'
-state = PBtoggle(device,state)
+state = 0 # bit flag of devices which are currently on
+#device = 'M'
+#state = PBtoggle(device,state)
 printStatus(state)
-a =1
-"""
+
 while True:
 		print('\n To quit, press E. For a list on devices that are on, press W')
 		device = input("Please enter key to toggle a device...\n")
@@ -86,4 +86,3 @@ while True:
 		else:
 			state = PBtoggle(device,state)
 
-"""
